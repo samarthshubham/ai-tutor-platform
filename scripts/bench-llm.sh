@@ -2,6 +2,7 @@
 # Times ping (cold and warm) and embedding of a 400-word text against a running tutor-api
 # and prints a markdown table. Run it with the API on a real AI profile (ollama or cloud).
 set -euo pipefail
+shopt -s inherit_errexit
 
 API_URL="${API_URL:-http://localhost:9190}"
 WARM_RUNS="${WARM_RUNS:-3}"
@@ -38,14 +39,14 @@ embed_body=$(jq -n --arg text "$text" '{text: $text}')
 
 ping_once() {
   local out body
-  out=$(request GET /api/ai/ping)
+  out=$(request GET /api/ai/ping) || exit 1
   body=$(head -n1 <<<"$out")
   echo "$(jq -r '.provider' <<<"$body")|$(jq -r '.model' <<<"$body")|$(jq -r '.reply' <<<"$body" | tr '\n|' '  ' | cut -c1-40)|$(jq -r '.latencyMs' <<<"$body")|$(seconds_to_ms "$(tail -n1 <<<"$out")")"
 }
 
 embed_once() {
   local out body
-  out=$(request POST /api/ai/embedding "$embed_body")
+  out=$(request POST /api/ai/embedding "$embed_body") || exit 1
   body=$(head -n1 <<<"$out")
   echo "$(jq -r '.provider' <<<"$body")|$(jq -r '.model' <<<"$body")|$(jq -r '.dimensions' <<<"$body") dims|$(jq -r '.latencyMs' <<<"$body")|$(seconds_to_ms "$(tail -n1 <<<"$out")")"
 }
@@ -58,11 +59,15 @@ row() {
 
 echo "| Call | Provider | Model | Result | Model ms | Round trip ms |"
 echo "|---|---|---|---|---|---|"
-row "ping (cold)" "$(ping_once)"
+line=$(ping_once) || exit 1
+row "ping (cold)" "$line"
 for i in $(seq 1 "$WARM_RUNS"); do
-  row "ping (warm $i)" "$(ping_once)"
+  line=$(ping_once) || exit 1
+  row "ping (warm $i)" "$line"
 done
-row "embed 400 words (first)" "$(embed_once)"
+line=$(embed_once) || exit 1
+row "embed 400 words (first)" "$line"
 for i in $(seq 1 "$WARM_RUNS"); do
-  row "embed 400 words (warm $i)" "$(embed_once)"
+  line=$(embed_once) || exit 1
+  row "embed 400 words (warm $i)" "$line"
 done
