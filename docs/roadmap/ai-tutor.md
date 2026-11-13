@@ -351,7 +351,7 @@ Goal: people sign in through Keycloak, the API knows who they are and what they 
 Labels: `backend` `security` `auth` · Size: M · Blocked by: E0-S3, E0-S6
 - **Goal:** every API call is authenticated with a Keycloak token, roles work in `@PreAuthorize`, and the caller exists as an `app_user`.
 - **Context:** ADR 0005; module design "Cross-cutting rules"; API design §1 and §2. Until now every endpoint is open. Pattern for JSON `401` and `403` bodies: `clinic-api` `JsonSecurityErrorHandler`.
-- **Scope:** `identity` module: security configuration, JWT role converter, `app_user` provisioning, `CurrentUser`, `GET /api/me`, test JWT support; secure `/api/ai/ping` for `ADMIN`.
+- **Scope:** `identity` module: security configuration, JWT role converter, `app_user` provisioning, `CurrentUser`, `GET /api/me`, test JWT support; secure `/api/ai/ping` and `/api/ai/embedding` for `ADMIN`, and make `scripts/bench-llm.sh` send a bearer token.
 - **Out of scope:** user listing and links (E1-S2), `AccessPolicy` (E1-S3), the web sign-in (E1-S4).
 - **Contract:**
   - Resource server with issuer `http://localhost:8180/realms/tutor` (`tutor.security.issuer-uri`), stateless, CSRF off, CORS for `http://localhost:4300`.
@@ -373,6 +373,8 @@ Labels: `backend` `security` `auth` · Size: M · Blocked by: E0-S3, E0-S6
   - [ ] Twenty concurrent first requests of one new user create one row and all succeed
   - [ ] A role change in the token is reflected in `app_user.role` on the next request
   - [ ] `GET /api/ai/ping` returns `200` for `ADMIN` and `403` with code `FORBIDDEN` for the other four roles
+  - [ ] `POST /api/ai/embedding` returns `200` for `ADMIN` and `403` with code `FORBIDDEN` for the other four roles
+  - [ ] `scripts/bench-llm.sh` sends a bearer token (from `TOKEN` when set, otherwise fetched for `admin1` through the `tutor-cli` client) and runs against the secured endpoints
   - [ ] The open paths answer without a token
   - [ ] A token with two of the five roles, or none, gets `403`
   - [ ] A real token from the compose Keycloak works against the running app (checked by hand and described in the pull request)
@@ -384,7 +386,8 @@ Labels: `backend` `security` `auth` · Size: M · Blocked by: E0-S3, E0-S6
   - [ ] Migration, entity, provisioning
   - [ ] `CurrentUser` resolver and `/api/me`
   - [ ] Test JWT support
-  - [ ] Secure the ping endpoint
+  - [ ] Secure the ping and embedding endpoints
+  - [ ] Bearer token in `scripts/bench-llm.sh`
 
 #### E1-S2 · Users, guardian links and tutor assignments
 Labels: `backend` `auth` · Size: M · Blocked by: E1-S1
