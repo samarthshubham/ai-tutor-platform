@@ -12,6 +12,22 @@ spring:
     web:
       pageable:
         max-page-size: 100
+  ai:
+    retry:
+      max-attempts: 0
+
+tutor:
+  ai:
+    ollama:
+      chat-model: llama3.2:3b
+    cloud:
+      chat-model: claude-haiku-5-5
+    timeout:
+      ping: 20s
+      search: 10s
+      generation: 120s
+      grading: 60s
+      chat-first-token: 30s
 
 management:
   endpoints:

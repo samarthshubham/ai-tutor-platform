@@ -14,7 +14,7 @@ import org.testcontainers.utility.DockerImageName;
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureMetrics
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "fake-ai"})
 @Import(IntegrationTest.SharedPostgres.class)
 public abstract class IntegrationTest {
 
