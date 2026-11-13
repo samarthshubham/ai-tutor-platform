@@ -1,0 +1,29 @@
+Proprietary Evaluation License
+
+Copyright (c) 2026 samarthshubham (Shubham Samarth). All rights reserved.
+
+This repository is provided for viewing and evaluation purposes only.
+
+No permission is granted to any person to copy, modify, merge, publish,
+distribute, sublicense, sell, or use this software or any portion of it
+in any form — commercial or non-commercial — without explicit prior written
+permission from the author.
+
+PERMITTED:
+  - Viewing the source code for personal learning or evaluation
+  - Forking on GitHub solely to submit a pull request to this repository
+
+NOT PERMITTED (without written permission):
+  - Copying or reproducing any part of this code in another project
+  - Modifying and distributing a derivative work
+  - Using this code in production, staging, or any deployed environment
+  - Sublicensing or re-publishing this code under any other license
+
+To request permission for any use not listed above, contact:
+  shubhamsamarth.dev@gmail.com
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. IN NO EVENT SHALL
+THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING
+FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.

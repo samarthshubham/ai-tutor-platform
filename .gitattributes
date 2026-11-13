@@ -1,0 +1,18 @@
+# Enforce LF line endings for all text files in this repo.
+# Prevents CRLF contamination when editing on Windows.
+* text=auto eol=lf
+
+# Binary files — never touch line endings
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.jar binary
+*.zip binary
+*.gz binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary

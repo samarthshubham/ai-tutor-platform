@@ -1,0 +1,89 @@
+# ===========================
+# Java / Maven
+# ===========================
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ===========================
+# Spring Boot
+# ===========================
+application-local.properties
+application-local.yml
+
+# ===========================
+# IDE — IntelliJ IDEA
+# ===========================
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# ===========================
+# IDE — VS Code
+# ===========================
+.vscode/
+!.vscode/extensions.json
+
+# ===========================
+# IDE — Eclipse
+# ===========================
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# ===========================
+# Angular / Node
+# ===========================
+node_modules/
+dist/
+.angular/
+*.js.map
+npm-debug.log*
+yarn-error.log*
+.env
+.env.local
+
+# ===========================
+# OS
+# ===========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===========================
+# Docker
+# ===========================
+infra/postgres-data/
+
+# ===========================
+# Dev script logs + state
+# ===========================
+logs/
+.dev.pids
+
+# ===========================
+# Others
+# ===========================
+.claude/*
+!.claude/skills/
+.serena
+
+# ===========================
+# Cypress
+# ===========================
+tutor-web/**/cypress/screenshots/
+tutor-web/**/cypress/videos/
+coverage/
+.nx/

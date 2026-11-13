@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+# Pre-commit: format staged Java and web files, re-stage, then proceed.
+
+ROOT=$(git rev-parse --show-toplevel)
+
+JAVA_STAGED=$(git diff --cached --name-only --diff-filter=ACM | grep '^tutor-api/.*\.java$' || true)
+if [ -n "$JAVA_STAGED" ] && [ -x "$ROOT/tutor-api/mvnw" ]; then
+  echo "[pre-commit] Formatting tutor-api Java files with Spotless..."
+  (cd "$ROOT/tutor-api" && ./mvnw spotless:apply -q)
+  echo "$JAVA_STAGED" | while IFS= read -r file; do
+    git add "$ROOT/$file"
+  done
+fi
+
+WEB_DIR="$ROOT/tutor-web"
+WEB_STAGED=$(git diff --cached --name-only --diff-filter=ACM \
+  | grep '^tutor-web/.*\.\(ts\|html\|scss\|css\|json\)$' || true)
+if [ -n "$WEB_STAGED" ] && [ -d "$WEB_DIR/node_modules" ]; then
+  echo "[pre-commit] Formatting web files with Prettier..."
+  RELATIVE=$(echo "$WEB_STAGED" | sed 's|^tutor-web/||')
+  (cd "$WEB_DIR" && echo "$RELATIVE" | tr '\n' '\0' | xargs -0 npx prettier --write)
+  echo "$WEB_STAGED" | while IFS= read -r file; do
+    git add "$ROOT/$file"
+  done
+fi
