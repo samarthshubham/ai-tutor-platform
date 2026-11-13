@@ -106,7 +106,8 @@ cd tutor-api
 
 # tutor-web (E0-S4)
 cd tutor-web
-npx nx serve tutor-app
+npm ci
+npx nx serve tutor-app                                 # :4300, proxies /api and /actuator to :9190
 npx nx run-many -t lint test build
 npx nx e2e tutor-app-e2e                               # needs the stack running (E0-S5)
 npx nx run seed-demo-data:seed                         # (E2-S4)
