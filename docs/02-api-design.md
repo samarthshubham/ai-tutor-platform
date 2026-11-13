@@ -29,6 +29,7 @@ The **Story** column names the roadmap story that builds the endpoint.
 | 409 | `CONFLICT` | Wrong state for this action, or a duplicate |
 | 429 | `RATE_LIMITED` | Too many AI requests; `Retry-After` header set |
 | 503 | `AI_UNAVAILABLE` | The model timed out or could not be reached |
+| 405, 406, 415, … | the status name, e.g. `METHOD_NOT_ALLOWED` | Other HTTP protocol errors raised by the framework (wrong method, unsupported media type); the status is kept |
 | 500 | `INTERNAL_ERROR` | Anything else; the message is generic |
 
 **Roles** in the tables: A = ADMIN, T = TEACHER, U = TUTOR, S = STUDENT, P = PARENT. "own" means limited by data ownership: a teacher's own courses, a tutor's assigned students, a parent's linked children, a student's own data.
