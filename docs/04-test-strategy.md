@@ -11,7 +11,7 @@ No test ever calls a real model. Tests and CI run with the `fake-ai` profile (se
 | **authorization matrix** | Every endpoint against all five roles and anonymous | Parameterized web slice test, one row per role with the expected status | `<Controller>AuthorizationTest` |
 | **integration** | Repositories, Flyway, transactions, events, pgvector | `@SpringBootTest` + Testcontainers `pgvector/pgvector:pg16`, profiles `test,fake-ai` | `<Feature>IT` |
 | **architecture** | Module boundaries and the Spring AI import rule | ArchUnit | `ModuleBoundaryTest` |
-| **frontend unit** | Components, services, guards | Jest + Angular Testing Library style queries | `*.spec.ts` |
+| **frontend unit** | Components, services, guards | Vitest + Angular Testing Library style queries | `*.spec.ts` |
 | **e2e** | A flow through the real stack | Cypress + Cucumber against `dev.sh` with `fake-ai` | `*.feature`, tags below |
 | **eval** | Quality of real model output | `./mvnw verify -Peval`, never in CI | `*Eval` |
 
@@ -33,7 +33,7 @@ e2e scenarios create their own data through the API with a unique run prefix and
 | Gate | Rule |
 |---|---|
 | Backend coverage | JaCoCo line coverage at least 90%, enforced by `./mvnw verify`. Excluded: the application main class, `*.config.*` and generated code only |
-| Frontend coverage | Jest: at least 90% statements and lines, 80% branches, per project |
+| Frontend coverage | Vitest: at least 90% statements and lines, 80% branches, per project |
 | Formatting | `./mvnw spotless:check`; `npx nx format:check` |
 | Lint | `npx nx lint` with zero warnings |
 | Build | `./mvnw verify`; `npx nx build tutor-app` |
@@ -44,7 +44,7 @@ Gates are never lowered and tests are never disabled to make a change pass.
 
 - Backend endpoint: unit tests for the service, a web slice test, a row per role in the authorization matrix, and an integration test for anything that touches the database or an event.
 - AI flow: unit tests with `FakeChatModel` covering the valid path, invalid output and a timeout.
-- Screen: Jest specs for each component and service, with loading, empty and error states covered; one `@ui` scenario for the main path.
+- Screen: Vitest specs for each component and service, with loading, empty and error states covered; one `@ui` scenario for the main path.
 - Bug fix: a test that fails before the fix.
 
 ## 5. Running
