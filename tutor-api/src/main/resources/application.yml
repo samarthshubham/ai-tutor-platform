@@ -1,0 +1,20 @@
+server:
+  port: 9190
+
+spring:
+  application:
+    name: tutor-api
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  data:
+    web:
+      pageable:
+        max-page-size: 100
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus

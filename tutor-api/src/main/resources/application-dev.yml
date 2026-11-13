@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5442/tutor
+    username: tutor
+    password: ${TUTOR_DB_PASSWORD:tutor}
+  flyway:
+    out-of-order: true
