@@ -79,6 +79,7 @@ logs/
 .claude/*
 !.claude/skills/
 .serena
+__pycache__/
 
 # ===========================
 # Cypress
