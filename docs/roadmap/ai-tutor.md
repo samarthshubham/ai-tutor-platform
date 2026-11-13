@@ -1606,3 +1606,13 @@ Each epic is a GitHub issue labelled `epic`, with its stories attached as sub-is
 
 | Epic | Issue | Stories (sub-issues) |
 |---|---|---|
+| E0 | #1 | S1 #2, S2 #3, S3 #4, S4 #5, S5 #6, S6 #7 |
+| E1 | #8 | S1 #9, S2 #10, S3 #11, S4 #12 |
+| E2 | #13 | S1 #14, S2 #15, S3 #16, S4 #17 |
+| E3 | #18 | S1 #19, S2 #20, S3 #21 |
+| E4 | #22 | S1 #23, S2 #24, S3 #25, S4 #26 |
+| E5 | #27 | S1 #28, S2 #29, S3 #30, S4 #31 |
+| E6 | #32 | S1 #33, S2 #34, S3 #35, S4 #36 |
+| E7 | #37 | S1 #38, S2 #39, S3 #40, S4 #41 |
+| E8 | #42 | S1 #43, S2 #44, S3 #45 |
+| E9 | #46 | S1 #47, S2 #48, S3 #49, S4 #50, S5 #51 |
