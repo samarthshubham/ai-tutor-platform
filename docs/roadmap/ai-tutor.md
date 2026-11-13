@@ -241,15 +241,15 @@ Labels: `backend` · Size: M · Blocked by: E0-S1
 #### E0-S4 · tutor-web skeleton
 Labels: `frontend` · Size: M · Blocked by: E0-S1
 - **Goal:** an Angular workspace with the app shell, shared libraries and quality gates, ready for feature screens.
-- **Context:** `docs/08-design-system.md`. Workspace to copy the setup from: `clinic-fhir-system/care-platform` (Nx 22, Angular 21, Jest, ESLint, Prettier, Cypress with the Cucumber preprocessor). Use the same major versions.
+- **Context:** `docs/08-design-system.md`. Workspace to copy the setup from: `clinic-fhir-system/care-platform` (Nx 22, Angular 21, Vitest, ESLint, Prettier, Cypress with the Cucumber preprocessor). Use the same major versions.
 - **Scope:** Nx workspace `tutor-web` with app `tutor-app` and libraries `api`, `ui`, `auth` (empty shell), Material theme, shell layout, error handling, proxy.
 - **Out of scope:** sign-in and guards (E1-S4), the e2e project and the seed app (E0-S5, E2-S4), every feature screen.
 - **Contract:**
-  - `npx nx serve tutor-app` on port 4300; `/api` proxied to `http://localhost:9190`.
+  - `npx nx serve tutor-app` on port 4300; `/api` and `/actuator` proxied to `http://localhost:9190`.
   - `libs/ui`: `tp-loading`, `tp-empty-state` (inputs `title`, `message`, optional action), `tp-error-banner` (input `error: ApiError`, output `retry`), `tp-page-header`.
   - `libs/api`: `ApiError` (`status, code, message, fields?`), `Page<T>`, `apiErrorInterceptor` that turns an `HttpErrorResponse` into `ApiError` (a network failure becomes code `NETWORK`), `SseClient` per design system §5 with unit tests against a mocked `fetch`.
   - Shell: top bar and side navigation from design system §2, with a placeholder navigation list and a home page reading `/actuator/health` through the proxy to show "API: UP".
-  - Jest coverage thresholds per test strategy §3 in every project's config.
+  - Vitest coverage thresholds per test strategy §3 in every project's config.
 - **Data:** n/a
 - **Notes:**
   - Standalone components, signals, zoneless change detection if the Angular version supports it as stable.

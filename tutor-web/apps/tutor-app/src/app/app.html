@@ -1,0 +1,46 @@
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<mat-toolbar class="top-bar">
+  <button
+    matIconButton
+    type="button"
+    aria-label="Toggle navigation"
+    aria-controls="side-navigation"
+    [attr.aria-expanded]="navigationOpen()"
+    (click)="toggleNavigation()"
+  >
+    <mat-icon aria-hidden="true">menu</mat-icon>
+  </button>
+  <span class="app-name">AI Tutor</span>
+</mat-toolbar>
+
+<mat-sidenav-container class="layout">
+  <mat-sidenav
+    id="side-navigation"
+    mode="side"
+    [opened]="navigationOpen()"
+    class="side-navigation"
+  >
+    <mat-nav-list aria-label="Main navigation">
+      @for (item of navigation; track item.path) {
+      <a
+        mat-list-item
+        [routerLink]="item.path"
+        routerLinkActive
+        #active="routerLinkActive"
+        [routerLinkActiveOptions]="{ exact: true }"
+        [activated]="active.isActive"
+        [attr.aria-current]="active.isActive ? 'page' : null"
+      >
+        {{ item.label }}
+      </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <main id="main-content" class="content" tabindex="-1">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

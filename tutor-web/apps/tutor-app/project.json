@@ -1,0 +1,80 @@
+{
+  "name": "tutor-app",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "tp",
+  "sourceRoot": "apps/tutor-app/src",
+  "tags": ["type:app"],
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/tutor-app",
+        "browser": "apps/tutor-app/src/main.ts",
+        "tsConfig": "apps/tutor-app/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/tutor-app/public"
+          }
+        ],
+        "styles": ["apps/tutor-app/src/styles.scss"]
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "8kb",
+              "maximumError": "12kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@angular/build:dev-server",
+      "options": {
+        "port": 4300,
+        "proxyConfig": "apps/tutor-app/proxy.conf.json"
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "tutor-app:build:production"
+        },
+        "development": {
+          "buildTarget": "tutor-app:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@angular/build:unit-test",
+      "options": {
+        "coverage": true,
+        "coverageInclude": ["apps/tutor-app/src/**/*.ts"],
+        "coverageExclude": ["**/*.spec.ts", "**/main.ts"],
+        "coverageReporters": ["lcov", "text-summary"],
+        "coverageThresholds": { "statements": 90, "lines": 90, "branches": 80 }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@tutor-web/api",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "rxjs": "^7.8.0"
+  },
+  "sideEffects": false
+}
