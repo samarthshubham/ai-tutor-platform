@@ -1,0 +1,31 @@
+name: Issue Sync
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+
+concurrency:
+  group: issue-sync-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  issue-sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      PR_BODY: ${{ github.event.pull_request.body }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Test the issue check
+        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
+
+      - name: Roadmap issues are linked and up to date
+        run: python3 -I .github/scripts/issue-sync-check.py

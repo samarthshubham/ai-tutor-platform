@@ -1,0 +1,71 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  claude-review:
+    if: |
+      github.event.pull_request.draft == false &&
+      !contains(github.event.pull_request.title, 'WIP') &&
+      !startsWith(github.event.pull_request.title, 'wip')
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      BASE_REF: ${{ github.event.pull_request.base.ref }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Work out what is new since the last review
+        id: range
+        run: bash .github/scripts/review-state.sh range
+
+      - name: Nothing new to review
+        if: steps.range.outputs.mode == 'skip'
+        run: echo "Only merge commits or no commits since ${{ steps.range.outputs.base }}; skipping review."
+
+      - name: Run Claude Code Review
+        id: claude
+        if: steps.range.outputs.mode != 'skip'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: >-
+            /incremental-review pr=${{ github.event.pull_request.number }}
+            repo=${{ github.repository }}
+            mode=${{ steps.range.outputs.mode }}
+            base=${{ steps.range.outputs.base }}
+            head=${{ steps.range.outputs.head }}
+            commits="${{ steps.range.outputs.commits }}"
+          claude_args: >-
+            --model claude-opus-5-5
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Read,Grep,Glob,Write,Bash(git show:*),Bash(git diff:*),Bash(git log:*),Bash(gh api:*)"
+
+      - name: Post review summary
+        if: steps.range.outputs.mode != 'skip' && steps.claude.outputs.execution_file != ''
+        env:
+          KEEP_HISTORY: 'true'
+        run: bash .github/scripts/review-state.sh save review-summary.md
+
+      - name: Review skipped by the action
+        if: steps.range.outputs.mode != 'skip' && steps.claude.outputs.execution_file == ''
+        run: echo "::notice::Review skipped by claude-code-action (usually because this PR changes the review workflow, which must match main). Nothing was reviewed for this push."

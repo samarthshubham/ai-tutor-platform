@@ -1,0 +1,30 @@
+name: Issue Sync Rerun
+
+on:
+  issues:
+    types: [edited, closed, reopened, milestoned, demilestoned]
+
+jobs:
+  rerun:
+    if: github.event.issue.milestone != null
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      pull-requests: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      ISSUE: ${{ github.event.issue.number }}
+    steps:
+      - name: Re-run the issue check on open PRs that reference this issue
+        run: |
+          gh pr list -R "$REPO" --state open --search "#$ISSUE in:body" --json number,headRefName,body \
+            --jq ".[] | select(.body | test(\"#$ISSUE\\\\b\")) | .headRefName" |
+            while read -r branch; do
+              run_id=$(gh run list -R "$REPO" --workflow issue-sync.yml --branch "$branch" --limit 1 \
+                --json databaseId --jq '.[0].databaseId // empty')
+              if [[ -n "$run_id" ]]; then
+                echo "Re-running issue check $run_id for $branch"
+                gh run rerun -R "$REPO" "$run_id"
+              fi
+            done

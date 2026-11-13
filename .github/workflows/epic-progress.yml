@@ -1,0 +1,38 @@
+name: Epic Progress
+
+on:
+  issues:
+    types: [closed, reopened]
+
+jobs:
+  epic:
+    if: >-
+      github.event.issue.milestone != null &&
+      !contains(github.event.issue.labels.*.name, 'epic')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      ISSUE: ${{ github.event.issue.number }}
+      ACTION: ${{ github.event.action }}
+    steps:
+      - name: Close the epic when its last story closes, reopen it when a story reopens
+        run: |
+          epic=$(gh api "repos/$REPO/issues/$ISSUE/parent" --jq '.number' 2>/dev/null || true)
+          if [[ -z "$epic" ]]; then
+            echo "::warning::#$ISSUE has no parent epic."
+            exit 0
+          fi
+          state=$(gh api "repos/$REPO/issues/$epic" --jq '.state')
+          if [[ "$ACTION" == "reopened" && "$state" == "closed" ]]; then
+            gh issue reopen -R "$REPO" "$epic" -c "Reopened because story #$ISSUE was reopened."
+            exit 0
+          fi
+          open=$(gh api --paginate "repos/$REPO/issues/$epic/sub_issues" --jq '[.[] | select(.state == "open")] | length')
+          if [[ "$ACTION" == "closed" && "$state" == "open" && "$open" == "0" ]]; then
+            gh issue close -R "$REPO" "$epic" -c "All stories are done; closing the epic. Last one: #$ISSUE."
+          else
+            echo "Epic #$epic: $open stories still open."
+          fi
