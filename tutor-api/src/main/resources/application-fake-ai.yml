@@ -1,0 +1,14 @@
+spring:
+  ai:
+    model:
+      chat: none
+      embedding: none
+
+tutor:
+  ai:
+    chat:
+      provider: fake
+      model: fake
+    embedding:
+      provider: fake
+      model: fake

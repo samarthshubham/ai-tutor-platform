@@ -1,0 +1,23 @@
+spring:
+  ai:
+    model:
+      chat: ollama
+      embedding: ollama
+    ollama:
+      chat:
+        model: ${tutor.ai.ollama.chat-model}
+        num-ctx: 4096
+        temperature: 0.2
+        keep-alive: 30m
+      embedding:
+        model: nomic-embed-text
+        keep-alive: 30m
+
+tutor:
+  ai:
+    chat:
+      provider: ollama
+      model: ${tutor.ai.ollama.chat-model}
+    embedding:
+      provider: ollama
+      model: nomic-embed-text

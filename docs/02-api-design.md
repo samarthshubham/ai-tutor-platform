@@ -326,12 +326,15 @@ data: {"code":"AI_UNAVAILABLE","message":"The tutor is not available right now"}
 | Method | Path | Roles | Story | Purpose |
 |---|---|---|---|---|
 | GET | `/ai/ping` | A | E0-S6 (open until E1-S1 secures it) | One tiny model call to prove the provider works |
+| POST | `/ai/embedding` | A | E0-S6 (open until E1-S1 secures it) | Embed a text (max 20000 characters) to prove the embedding model works; used by `scripts/bench-llm.sh` |
 | GET | `/ai/usage?from=&to=` | A | E9-S2 | Calls, tokens, latency and failures per feature |
 | GET | `/ai/calls?feature=&outcome=` | A | E9-S2 | Page of `ai_call_log` rows |
 
 ```json
 // ping
 { "provider": "ollama", "model": "llama3.2:3b", "reply": "pong", "latencyMs": 812 }
+// embedding: request { "text": "..." }
+{ "provider": "ollama", "model": "nomic-embed-text", "dimensions": 768, "latencyMs": 95 }
 // usage
 [ { "feature": "QUESTION_GEN", "calls": 12, "failures": 1, "promptTokens": 18230, "completionTokens": 6110, "p50LatencyMs": 21400, "p95LatencyMs": 38900 } ]
 ```

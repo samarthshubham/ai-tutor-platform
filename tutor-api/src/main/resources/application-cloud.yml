@@ -1,0 +1,24 @@
+spring:
+  ai:
+    model:
+      chat: anthropic
+      embedding: ollama
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY}
+      timeout: ${tutor.ai.timeout.ping}
+      max-retries: 0
+      chat:
+        model: ${tutor.ai.cloud.chat-model}
+    ollama:
+      embedding:
+        model: nomic-embed-text
+        keep-alive: 30m
+
+tutor:
+  ai:
+    chat:
+      provider: anthropic
+      model: ${tutor.ai.cloud.chat-model}
+    embedding:
+      provider: ollama
+      model: nomic-embed-text

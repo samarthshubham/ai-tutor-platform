@@ -93,7 +93,8 @@ All methods throw `common.api.AiUnavailableException` when the model times out o
 - Embeddings are 768-dimensional in every profile, so stored vectors stay valid when the chat provider changes. This is why `cloud` still embeds with Ollama.
 - Both model starters are on the classpath; the profile picks the beans through Spring AI's model selection properties (`spring.ai.model.chat`, `spring.ai.model.embedding`). `fake-ai` sets both to `none` and registers the fake beans.
 - Ollama options in the `ollama` profile: context window 4096 tokens, temperature 0.2 for generation and grading and 0.6 for chat, keep-alive 30 minutes.
-- Timeouts (`tutor.ai.timeout.*`): ping 20 s, search 10 s, generation 120 s, grading 60 s, chat first token 30 s.
+- Timeouts (`tutor.ai.timeout.*`): ping 20 s, search 10 s, generation 120 s, grading 60 s, chat first token 30 s. They are set on the provider HTTP clients (the Ollama `RestClient` read timeout, the Anthropic client timeout). Ping is the only call in E0-S6, so both clients use the ping timeout; the story that adds a longer call gives it a client with its own timeout. Spring AI's retry is off (`spring.ai.retry.max-attempts: 0`) so a timeout is reported at once.
+- Each profile also sets `tutor.ai.chat.provider/model` and `tutor.ai.embedding.provider/model`, which `AiCallLogger` writes to `ai_call_log` and the ping response returns.
 
 ## 4. Fake models
 
@@ -167,7 +168,7 @@ Rules every prompt follows:
 
 ## 7. Logging and metrics
 
-`AiCallLogger.record(feature, promptVersion, userId, supplier)` wraps every model call: it measures latency, reads token usage from the response metadata, maps exceptions to an outcome, writes `ai_call_log` in its own transaction (`REQUIRES_NEW`) and updates the Micrometer meters:
+`AiCallLogger.record(feature, promptVersion, userId, supplier)` wraps every chat model call and `AiCallLogger.recordEmbedding(feature, userId, supplier)` every embedding call: it measures latency, reads token usage from the response metadata, maps exceptions to an outcome, writes `ai_call_log` in its own transaction (`REQUIRES_NEW`) and updates the Micrometer meters:
 
 - `tutor.ai.calls` counter, tags `feature`, `outcome`, `provider`
 - `tutor.ai.latency` timer, tag `feature`
