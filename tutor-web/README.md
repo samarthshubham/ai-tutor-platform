@@ -2,12 +2,12 @@
 
 The Angular 21 Nx workspace for the AI Tutor Platform. Node 22 and npm 10.
 
-| Project | Path | Contents |
-|---|---|---|
+| Project     | Path             | Contents                                                                                                    |
+| ----------- | ---------------- | ----------------------------------------------------------------------------------------------------------- |
 | `tutor-app` | `apps/tutor-app` | The app: Material theme, shell (top bar and side navigation), lazy feature routes under `src/app/features/` |
-| `api` | `libs/api` | `ApiError`, `Page<T>`, `apiErrorInterceptor`, `SseClient`, typed API clients (`HealthApi`) |
-| `ui` | `libs/ui` | `tp-loading`, `tp-empty-state`, `tp-error-banner`, `tp-page-header` |
-| `auth` | `libs/auth` | Roles; sign-in and guards arrive with E1-S4 |
+| `api`       | `libs/api`       | `ApiError`, `Page<T>`, `apiErrorInterceptor`, `SseClient`, typed API clients (`HealthApi`)                  |
+| `ui`        | `libs/ui`        | `tp-loading`, `tp-empty-state`, `tp-error-banner`, `tp-page-header`                                         |
+| `auth`      | `libs/auth`      | Roles; sign-in and guards arrive with E1-S4                                                                 |
 
 Lint boundaries: the app imports only libraries; `api` imports nothing; `ui` and `auth` may import `api`.
 
