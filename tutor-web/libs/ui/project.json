@@ -1,0 +1,38 @@
+{
+  "name": "ui",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/ui/src",
+  "prefix": "tp",
+  "projectType": "library",
+  "tags": ["type:lib", "scope:ui"],
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:ng-packagr-lite",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "libs/ui/ng-package.json",
+        "tsConfig": "libs/ui/tsconfig.lib.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/ui/tsconfig.lib.prod.json"
+        },
+        "development": {}
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@nx/angular:unit-test",
+      "options": {
+        "coverage": true,
+        "coverageInclude": ["libs/ui/src/**/*.ts"],
+        "coverageExclude": ["**/*.spec.ts", "**/index.ts"],
+        "coverageReporters": ["lcov", "text-summary"],
+        "coverageThresholds": { "statements": 90, "lines": 90, "branches": 80 }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
