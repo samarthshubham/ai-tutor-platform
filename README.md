@@ -54,4 +54,4 @@ Only one module talks to the model; the rest of the code sees plain Java interfa
 
 ## Running it
 
-Prerequisites: Docker, Java 21, Node 22, and optionally [Ollama](https://ollama.com) with a small chat model and `nomic-embed-text`. The commands arrive with the Foundations epic (E0); see [CLAUDE.md](CLAUDE.md#commands).
+Prerequisites: Docker, Java 21, Node 22, `curl` and `jq`, and optionally [Ollama](https://ollama.com) with a small chat model and `nomic-embed-text`. The local services (PostgreSQL, Keycloak, Mailpit, Prometheus, Grafana) start with `docker compose -f infra/docker-compose.yml up -d --wait`; see [infra/README.md](infra/README.md) and [CLAUDE.md](CLAUDE.md#commands).
