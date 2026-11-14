@@ -1,0 +1,231 @@
+{
+  "realm": "tutor",
+  "displayName": "AI Tutor",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "accessTokenLifespan": 900,
+  "roles": {
+    "realm": [
+      {
+        "name": "ADMIN",
+        "description": "Admin of the AI Tutor platform"
+      },
+      {
+        "name": "TEACHER",
+        "description": "Teacher of the AI Tutor platform"
+      },
+      {
+        "name": "TUTOR",
+        "description": "Tutor of the AI Tutor platform"
+      },
+      {
+        "name": "STUDENT",
+        "description": "Student of the AI Tutor platform"
+      },
+      {
+        "name": "PARENT",
+        "description": "Parent of the AI Tutor platform"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "admin1",
+      "enabled": true,
+      "email": "admin1@tutor.local",
+      "emailVerified": true,
+      "firstName": "Ada",
+      "lastName": "Admin",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin#2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "ADMIN"
+      ]
+    },
+    {
+      "username": "teacher1",
+      "enabled": true,
+      "email": "teacher1@tutor.local",
+      "emailVerified": true,
+      "firstName": "Tara",
+      "lastName": "Teacher",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Teacher#2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "TEACHER"
+      ]
+    },
+    {
+      "username": "teacher2",
+      "enabled": true,
+      "email": "teacher2@tutor.local",
+      "emailVerified": true,
+      "firstName": "Tom",
+      "lastName": "Teacher",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Teacher#2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "TEACHER"
+      ]
+    },
+    {
+      "username": "tutor1",
+      "enabled": true,
+      "email": "tutor1@tutor.local",
+      "emailVerified": true,
+      "firstName": "Uma",
+      "lastName": "Tutor",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Tutor#2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "TUTOR"
+      ]
+    },
+    {
+      "username": "student1",
+      "enabled": true,
+      "email": "student1@tutor.local",
+      "emailVerified": true,
+      "firstName": "Sam",
+      "lastName": "Student",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Student#2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "STUDENT"
+      ]
+    },
+    {
+      "username": "student2",
+      "enabled": true,
+      "email": "student2@tutor.local",
+      "emailVerified": true,
+      "firstName": "Sara",
+      "lastName": "Student",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Student#2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "STUDENT"
+      ]
+    },
+    {
+      "username": "student3",
+      "enabled": true,
+      "email": "student3@tutor.local",
+      "emailVerified": true,
+      "firstName": "Sid",
+      "lastName": "Student",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Student#2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "STUDENT"
+      ]
+    },
+    {
+      "username": "parent1",
+      "enabled": true,
+      "email": "parent1@tutor.local",
+      "emailVerified": true,
+      "firstName": "Pat",
+      "lastName": "Parent",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Parent#2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "PARENT"
+      ]
+    },
+    {
+      "username": "parent2",
+      "enabled": true,
+      "email": "parent2@tutor.local",
+      "emailVerified": true,
+      "firstName": "Priya",
+      "lastName": "Parent",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Parent#2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "PARENT"
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "tutor-web",
+      "name": "AI Tutor web app",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:4300/*"
+      ],
+      "webOrigins": [
+        "http://localhost:4300"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:4300/*"
+      }
+    },
+    {
+      "clientId": "tutor-cli",
+      "name": "AI Tutor seed, e2e and curl",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false
+    }
+  ]
+}
