@@ -6,7 +6,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import io.github.samarthshubham.tutor.identity.api.Role;
 import io.github.samarthshubham.tutor.support.IntegrationTest;
+import io.github.samarthshubham.tutor.support.TestJwt;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,14 +33,14 @@ class ActuatorIT extends IntegrationTest {
 
   @Test
   void infoIsExposedAndNamesTheActiveChatProvider() throws Exception {
-    mvc.perform(get("/actuator/info"))
+    mvc.perform(get("/actuator/info").with(TestJwt.as(Role.ADMIN)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.ai.chat-provider").value("fake"));
   }
 
   @Test
   void otherEndpointsAreNotExposed() throws Exception {
-    mvc.perform(get("/actuator/env"))
+    mvc.perform(get("/actuator/env").with(TestJwt.as(Role.ADMIN)))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.code").value("NOT_FOUND"));
   }
@@ -55,7 +57,7 @@ class ActuatorIT extends IntegrationTest {
 
   @Test
   void unknownPathReturnsErrorResponse() throws Exception {
-    mvc.perform(get("/api/does-not-exist"))
+    mvc.perform(get("/api/does-not-exist").with(TestJwt.as(Role.ADMIN)))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.status").value(404))
         .andExpect(jsonPath("$.code").value("NOT_FOUND"))

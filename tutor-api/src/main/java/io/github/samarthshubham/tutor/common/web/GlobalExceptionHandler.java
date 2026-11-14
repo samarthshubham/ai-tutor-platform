@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.method.ParameterErrors;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -52,6 +53,11 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(ForbiddenException.class)
   ResponseEntity<ErrorResponse> handleForbidden(ForbiddenException ex) {
     return error(HttpStatus.FORBIDDEN, "FORBIDDEN", ex.getMessage());
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+    return error(HttpStatus.FORBIDDEN, "FORBIDDEN", "Access denied");
   }
 
   @ExceptionHandler(AiUnavailableException.class)

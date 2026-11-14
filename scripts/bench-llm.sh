@@ -1,24 +1,50 @@
 #!/usr/bin/env bash
 # Times ping (cold and warm) and embedding of a 400-word text against a running tutor-api
 # and prints a markdown table. Run it with the API on a real AI profile (ollama or cloud).
+# Both endpoints are ADMIN-only: TOKEN is used when set, otherwise a token for admin1 is
+# fetched from Keycloak through the tutor-cli client.
 set -euo pipefail
 shopt -s inherit_errexit
 
 API_URL="${API_URL:-http://localhost:9190}"
 WARM_RUNS="${WARM_RUNS:-3}"
+KEYCLOAK_URL="${KEYCLOAK_URL:-http://localhost:8180}"
+BENCH_USER="${BENCH_USER:-admin1}"
+BENCH_PASSWORD="${BENCH_PASSWORD:-Admin#2026}"
 
 for tool in curl jq; do
   command -v "$tool" >/dev/null || { echo "bench-llm: $tool is required" >&2; exit 1; }
 done
 
+fetch_token() {
+  local response token
+  response=$(curl -sS "$KEYCLOAK_URL/realms/tutor/protocol/openid-connect/token" \
+    -d grant_type=password -d client_id=tutor-cli \
+    --data-urlencode "username=$BENCH_USER" --data-urlencode "password=$BENCH_PASSWORD") || {
+    echo "bench-llm: could not reach Keycloak on $KEYCLOAK_URL; set TOKEN or start the stack" >&2
+    exit 1
+  }
+  token=$(jq -r '.access_token // empty' <<<"$response")
+  if [[ -z "$token" ]]; then
+    echo "bench-llm: Keycloak gave no token for $BENCH_USER: $response" >&2
+    exit 1
+  fi
+  echo "$token"
+}
+
+if [[ -z "${TOKEN:-}" ]]; then
+  TOKEN=$(fetch_token) || exit 1
+fi
+
 request() {
   local method="$1" path="$2" body="${3:-}"
   local response status
   if [[ -n "$body" ]]; then
-    response=$(curl -sS -w '\n%{http_code} %{time_total}' -X "$method" -H 'Content-Type: application/json' \
-      --data "$body" "$API_URL$path")
+    response=$(curl -sS -w '\n%{http_code} %{time_total}' -X "$method" -H "Authorization: Bearer $TOKEN" \
+      -H 'Content-Type: application/json' --data "$body" "$API_URL$path")
   else
-    response=$(curl -sS -w '\n%{http_code} %{time_total}' -X "$method" "$API_URL$path")
+    response=$(curl -sS -w '\n%{http_code} %{time_total}' -X "$method" -H "Authorization: Bearer $TOKEN" \
+      "$API_URL$path")
   fi
   status=$(tail -n1 <<<"$response" | cut -d' ' -f1)
   if [[ "$status" != "200" ]]; then

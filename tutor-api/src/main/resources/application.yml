@@ -15,8 +15,17 @@ spring:
   ai:
     retry:
       max-attempts: 0
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${tutor.security.issuer-uri}
 
 tutor:
+  security:
+    issuer-uri: http://localhost:8180/realms/tutor
+    allowed-origins:
+      - http://localhost:4300
   ai:
     ollama:
       chat-model: llama3.2:3b

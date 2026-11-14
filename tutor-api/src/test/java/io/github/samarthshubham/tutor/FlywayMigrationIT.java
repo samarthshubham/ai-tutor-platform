@@ -30,4 +30,14 @@ class FlywayMigrationIT extends IntegrationTest {
     assertThat(jdbc.queryForObject("select '[1,2]'::vector <-> '[1,2]'::vector", Double.class))
         .isZero();
   }
+
+  @Test
+  void identityMigrationSeedsTheOneSchool() {
+    assertThat(jdbc.queryForList("select name from school", String.class))
+        .containsExactly("Riverside Academy");
+    assertThat(
+            jdbc.queryForObject(
+                "select id::text from school where name = 'Riverside Academy'", String.class))
+        .isEqualTo("00000000-0000-0000-0000-000000000001");
+  }
 }

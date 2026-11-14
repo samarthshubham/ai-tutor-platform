@@ -7,14 +7,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.samarthshubham.tutor.common.api.AiUnavailableException;
+import io.github.samarthshubham.tutor.identity.api.Role;
+import io.github.samarthshubham.tutor.support.TestJwt;
+import io.github.samarthshubham.tutor.support.WebSliceTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(AiOpsController.class)
+@WebSliceTest(AiOpsController.class)
 class AiOpsControllerTest {
 
   @Autowired MockMvc mvc;
@@ -25,7 +27,7 @@ class AiOpsControllerTest {
   void pingReturnsProviderModelReplyAndLatency() throws Exception {
     when(service.ping()).thenReturn(new PingResponse("ollama", "llama3.2:3b", "pong", 812));
 
-    mvc.perform(get("/api/ai/ping"))
+    mvc.perform(get("/api/ai/ping").with(TestJwt.as(Role.ADMIN)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.provider").value("ollama"))
         .andExpect(jsonPath("$.model").value("llama3.2:3b"))
@@ -37,7 +39,7 @@ class AiOpsControllerTest {
   void pingTimeoutReturns503AiUnavailable() throws Exception {
     when(service.ping()).thenThrow(new AiUnavailableException("The model timed out"));
 
-    mvc.perform(get("/api/ai/ping"))
+    mvc.perform(get("/api/ai/ping").with(TestJwt.as(Role.ADMIN)))
         .andExpect(status().isServiceUnavailable())
         .andExpect(jsonPath("$.status").value(503))
         .andExpect(jsonPath("$.code").value("AI_UNAVAILABLE"))
@@ -51,6 +53,7 @@ class AiOpsControllerTest {
 
     mvc.perform(
             post("/api/ai/embedding")
+                .with(TestJwt.as(Role.ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"text\":\"some text\"}"))
         .andExpect(status().isOk())
@@ -64,6 +67,7 @@ class AiOpsControllerTest {
   void blankEmbeddingTextIsRejected() throws Exception {
     mvc.perform(
             post("/api/ai/embedding")
+                .with(TestJwt.as(Role.ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"text\":\" \"}"))
         .andExpect(status().isBadRequest())

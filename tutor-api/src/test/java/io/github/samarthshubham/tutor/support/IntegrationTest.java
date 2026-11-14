@@ -15,7 +15,7 @@ import org.testcontainers.utility.DockerImageName;
 @AutoConfigureMockMvc
 @AutoConfigureMetrics
 @ActiveProfiles({"test", "fake-ai"})
-@Import(IntegrationTest.SharedPostgres.class)
+@Import({IntegrationTest.SharedPostgres.class, TestJwtDecoderConfig.class})
 public abstract class IntegrationTest {
 
   private static final PostgreSQLContainer POSTGRES =

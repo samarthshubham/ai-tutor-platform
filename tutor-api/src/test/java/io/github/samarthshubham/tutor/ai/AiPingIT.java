@@ -14,7 +14,9 @@ import io.github.samarthshubham.tutor.ai.log.AiCallLog;
 import io.github.samarthshubham.tutor.ai.log.AiCallLogRepository;
 import io.github.samarthshubham.tutor.ai.log.AiCallLogger;
 import io.github.samarthshubham.tutor.ai.log.AiCallOutcome;
+import io.github.samarthshubham.tutor.identity.api.Role;
 import io.github.samarthshubham.tutor.support.IntegrationTest;
+import io.github.samarthshubham.tutor.support.TestJwt;
 import java.net.SocketTimeoutException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +43,7 @@ class AiPingIT extends IntegrationTest {
 
   @Test
   void pingRepliesPongAndWritesOneOkRow() throws Exception {
-    mvc.perform(get("/api/ai/ping"))
+    mvc.perform(get("/api/ai/ping").with(TestJwt.as(Role.ADMIN)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.provider").value("fake"))
         .andExpect(jsonPath("$.model").value("fake"))
@@ -66,7 +68,7 @@ class AiPingIT extends IntegrationTest {
     fakeChatModel.failNext(
         new ResourceAccessException("I/O error", new SocketTimeoutException("Read timed out")));
 
-    mvc.perform(get("/api/ai/ping"))
+    mvc.perform(get("/api/ai/ping").with(TestJwt.as(Role.ADMIN)))
         .andExpect(status().isServiceUnavailable())
         .andExpect(jsonPath("$.code").value("AI_UNAVAILABLE"));
 
@@ -82,7 +84,8 @@ class AiPingIT extends IntegrationTest {
   void emptyReplyIsLoggedAsInvalidOutput() throws Exception {
     fakeChatModel.enqueue(" ");
 
-    mvc.perform(get("/api/ai/ping")).andExpect(status().isInternalServerError());
+    mvc.perform(get("/api/ai/ping").with(TestJwt.as(Role.ADMIN)))
+        .andExpect(status().isInternalServerError());
 
     assertThat(logs.findAll())
         .singleElement()
@@ -103,7 +106,7 @@ class AiPingIT extends IntegrationTest {
 
   @Test
   void metersAppearInPrometheusAfterAPing() throws Exception {
-    mvc.perform(get("/api/ai/ping")).andExpect(status().isOk());
+    mvc.perform(get("/api/ai/ping").with(TestJwt.as(Role.ADMIN))).andExpect(status().isOk());
 
     mvc.perform(get("/actuator/prometheus"))
         .andExpect(status().isOk())
@@ -115,6 +118,7 @@ class AiPingIT extends IntegrationTest {
   void embeddingReturns768DimensionsAndIsLogged() throws Exception {
     mvc.perform(
             post("/api/ai/embedding")
+                .with(TestJwt.as(Role.ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"text\":\"Plants turn light into sugar.\"}"))
         .andExpect(status().isOk())

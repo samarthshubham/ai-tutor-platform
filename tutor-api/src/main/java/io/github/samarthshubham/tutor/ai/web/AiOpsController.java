@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,8 +24,13 @@ public class AiOpsController {
   }
 
   @GetMapping("/ping")
+  @PreAuthorize("hasRole('ADMIN')")
   @Operation(summary = "Make one tiny model call to prove the provider works")
   @ApiResponse(responseCode = "200", description = "The model replied")
+  @ApiResponse(
+      responseCode = "403",
+      description = "The caller is not an admin",
+      content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   @ApiResponse(
       responseCode = "503",
       description = "The model timed out or could not be reached",
@@ -34,11 +40,16 @@ public class AiOpsController {
   }
 
   @PostMapping("/embedding")
+  @PreAuthorize("hasRole('ADMIN')")
   @Operation(summary = "Embed a text to prove the embedding model works")
   @ApiResponse(responseCode = "200", description = "The text was embedded")
   @ApiResponse(
       responseCode = "400",
       description = "The text is blank or too long",
+      content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+  @ApiResponse(
+      responseCode = "403",
+      description = "The caller is not an admin",
       content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   @ApiResponse(
       responseCode = "503",
