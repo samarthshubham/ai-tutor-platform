@@ -1,0 +1,118 @@
+name: E2E
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      stack: ${{ steps.stack.outputs.stack }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes to the stack
+        id: stack
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" != pull_request ]]; then
+            echo stack=true >>"$GITHUB_OUTPUT"
+          elif git diff --name-only "origin/$BASE_REF...HEAD" |
+            grep -qE '^(tutor-api/|tutor-web/|infra/|dev\.sh$|\.github/workflows/e2e\.yml$)'; then
+            echo stack=true >>"$GITHUB_OUTPUT"
+          else
+            echo stack=false >>"$GITHUB_OUTPUT"
+          fi
+
+  e2e:
+    needs: changes
+    if: needs.changes.outputs.stack == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      LOGS: ${{ github.workspace }}/e2e-logs
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tutor-web/package-lock.json
+
+      - name: Start the compose stack
+        run: |
+          mkdir -p "$LOGS"
+          docker compose -f infra/docker-compose.yml up -d --wait
+
+      - name: Build tutor-api
+        working-directory: tutor-api
+        run: ./mvnw -B -DskipTests package
+
+      - name: Start tutor-api with dev,fake-ai
+        working-directory: tutor-api
+        run: |
+          jar=$(ls target/tutor-api-*.jar)
+          nohup java -Djava.net.preferIPv4Stack=true -jar "$jar" \
+            --spring.profiles.active=dev,fake-ai >"$LOGS/tutor-api.log" 2>&1 &
+          for _ in $(seq 1 60); do
+            curl -fsS http://localhost:9190/actuator/health | grep -q '"status":"UP"' && exit 0
+            sleep 2
+          done
+          cat "$LOGS/tutor-api.log"
+          exit 1
+
+      - name: Install frontend dependencies
+        working-directory: tutor-web
+        run: npm ci
+
+      - name: Build and serve tutor-app
+        working-directory: tutor-web
+        env:
+          NX_DAEMON: 'false'
+          NX_NO_CLOUD: 'true'
+        run: |
+          nohup npx nx serve tutor-app --configuration=production >"$LOGS/tutor-app.log" 2>&1 &
+          for _ in $(seq 1 90); do
+            curl -fsS http://localhost:4300/ | grep -q '<tp-root' && exit 0
+            sleep 2
+          done
+          cat "$LOGS/tutor-app.log"
+          exit 1
+
+      - name: Run the @smoke scenarios
+        working-directory: tutor-web
+        env:
+          CYPRESS_tags: '@smoke'
+          NX_DAEMON: 'false'
+          NX_NO_CLOUD: 'true'
+        run: npx nx e2e tutor-app-e2e
+
+      - name: Collect container logs
+        if: failure()
+        run: docker compose -f infra/docker-compose.yml logs --no-color >"$LOGS/compose.log" 2>&1
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-logs-and-screenshots
+          path: |
+            e2e-logs/
+            tutor-web/dist/cypress/
+            tutor-web/apps/tutor-app-e2e/reports/
+          if-no-files-found: ignore
