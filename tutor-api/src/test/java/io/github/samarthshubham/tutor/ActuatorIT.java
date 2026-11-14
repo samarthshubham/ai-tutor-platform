@@ -30,8 +30,10 @@ class ActuatorIT extends IntegrationTest {
   }
 
   @Test
-  void infoIsExposed() throws Exception {
-    mvc.perform(get("/actuator/info")).andExpect(status().isOk());
+  void infoIsExposedAndNamesTheActiveChatProvider() throws Exception {
+    mvc.perform(get("/actuator/info"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.ai.chat-provider").value("fake"));
   }
 
   @Test
