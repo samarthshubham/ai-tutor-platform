@@ -92,11 +92,12 @@ stop_group() {
 
 teardown() {
   section "Stopping the stack"
-  local service
-  for service in tutor-app tutor-api; do
-    stop_group "$service" "$(recorded "$service")"
-  done
+  local app_pid api_pid
+  app_pid=$(recorded tutor-app)
+  api_pid=$(recorded tutor-api)
   rm -f "$PID_FILE"
+  stop_group tutor-app "$app_pid"
+  stop_group tutor-api "$api_pid"
   if "${COMPOSE[@]}" down >>"$LOG_DIR/docker.log" 2>&1; then
     ok "containers stopped (data kept)"
   else
