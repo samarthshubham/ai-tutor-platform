@@ -101,6 +101,29 @@ class UserProvisioningIT extends IntegrationTest {
   }
 
   @Test
+  void aRecreatedKeycloakUserWithTheSameUsernameGets409AndTheOldRowIsKept() throws Exception {
+    String username = uniqueUsername("parent");
+    mvc.perform(
+            get("/api/me").header(HttpHeaders.AUTHORIZATION, TestJwt.bearer(username, "PARENT")))
+        .andExpect(status().isOk());
+    jdbc.update(
+        "update app_user set keycloak_id = ? where username = ?",
+        UUID.randomUUID().toString(),
+        username);
+
+    mvc.perform(
+            get("/api/me").header(HttpHeaders.AUTHORIZATION, TestJwt.bearer(username, "PARENT")))
+        .andExpect(status().isConflict())
+        .andExpect(jsonPath("$.code").value("CONFLICT"));
+
+    assertThat(rowsFor(username)).isEqualTo(1);
+    assertThat(
+            jdbc.queryForObject(
+                "select keycloak_id from app_user where username = ?", String.class, username))
+        .isNotEqualTo(TestJwt.keycloakId(username));
+  }
+
+  @Test
   void anAdminTokenReachesTheSecuredPing() throws Exception {
     mvc.perform(
             get("/api/ai/ping")

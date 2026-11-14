@@ -8,6 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.github.samarthshubham.tutor.common.api.ConflictException;
 import io.github.samarthshubham.tutor.identity.api.Role;
 import io.github.samarthshubham.tutor.identity.domain.AppUser;
 import io.github.samarthshubham.tutor.identity.domain.AppUserRepository;
@@ -110,11 +111,28 @@ class UserProvisioningServiceTest {
   }
 
   @Test
-  void aConstraintViolationWithoutARowIsRethrown() {
-    DataIntegrityViolationException violation =
-        new DataIntegrityViolationException("username taken");
+  void aUsernameHeldByAnotherKeycloakIdIsAConflictAndIsNotRelinked() {
+    AppUser previousOwner =
+        existing(
+            new TokenUser("kc-old", "teacher1", "Tara Teacher", null, Role.TEACHER),
+            NOW.minusSeconds(5));
+    when(users.findByKeycloakId("kc-1")).thenReturn(Optional.empty());
+    when(users.saveAndFlush(any())).thenThrow(new DataIntegrityViolationException("username"));
+    when(users.findByUsername("teacher1")).thenReturn(Optional.of(previousOwner));
+
+    assertThatThrownBy(() -> service.provision(TEACHER))
+        .isInstanceOf(ConflictException.class)
+        .hasMessage(UserProvisioningService.USERNAME_TAKEN_MESSAGE);
+    verify(users, never()).save(any());
+    assertThat(previousOwner.getKeycloakId()).isEqualTo("kc-old");
+  }
+
+  @Test
+  void anyOtherConstraintViolationIsRethrown() {
+    DataIntegrityViolationException violation = new DataIntegrityViolationException("other");
     when(users.findByKeycloakId("kc-1")).thenReturn(Optional.empty());
     when(users.saveAndFlush(any())).thenThrow(violation);
+    when(users.findByUsername("teacher1")).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> service.provision(TEACHER)).isSameAs(violation);
   }

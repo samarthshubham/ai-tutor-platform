@@ -35,6 +35,10 @@ public class MeController {
       responseCode = "403",
       description = "The token does not carry exactly one of the five roles",
       content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+  @ApiResponse(
+      responseCode = "409",
+      description = "The token's username belongs to another account",
+      content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   public UserResponse me(CurrentUser user) {
     return users.get(user.id());
   }
