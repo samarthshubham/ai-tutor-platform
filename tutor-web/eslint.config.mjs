@@ -19,6 +19,15 @@ export default [
             {
               sourceTag: 'type:app',
               onlyDependOnLibsWithTags: ['type:lib'],
+              notDependOnLibsWithTags: ['scope:e2e'],
+            },
+            {
+              sourceTag: 'type:e2e',
+              onlyDependOnLibsWithTags: ['scope:e2e'],
+            },
+            {
+              sourceTag: 'scope:e2e',
+              onlyDependOnLibsWithTags: [],
             },
             {
               sourceTag: 'scope:api',
