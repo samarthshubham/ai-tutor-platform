@@ -11,10 +11,13 @@ import io.github.samarthshubham.tutor.common.api.ForbiddenException;
 import io.github.samarthshubham.tutor.identity.api.CurrentUser;
 import io.github.samarthshubham.tutor.identity.api.CurrentUserProvider;
 import io.github.samarthshubham.tutor.identity.api.Role;
+import io.github.samarthshubham.tutor.identity.api.UserSummary;
+import io.github.samarthshubham.tutor.identity.service.RelationshipService;
 import io.github.samarthshubham.tutor.identity.service.UserResponse;
 import io.github.samarthshubham.tutor.identity.service.UserService;
 import io.github.samarthshubham.tutor.support.TestJwt;
 import io.github.samarthshubham.tutor.support.WebSliceTest;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,7 @@ class MeControllerTest {
   @Autowired CurrentUserProvider currentUserProvider;
 
   @MockitoBean UserService users;
+  @MockitoBean RelationshipService relationships;
 
   @Test
   void returnsTheCurrentUserResolvedFromTheToken() throws Exception {
@@ -88,5 +92,33 @@ class MeControllerTest {
     mvc.perform(get("/api/me").with(TestJwt.as(Role.STUDENT)))
         .andExpect(status().isForbidden())
         .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+  }
+
+  @Test
+  void myStudentsReturnsTheLinkedStudentsAsSummaries() throws Exception {
+    CurrentUser parent = new CurrentUser(UUID.randomUUID(), "kc-parent1", Role.PARENT, SCHOOL_ID);
+    UUID studentId = UUID.randomUUID();
+    when(currentUserProvider.currentUser()).thenReturn(parent);
+    when(relationships.studentsOf(parent))
+        .thenReturn(List.of(new UserSummary(studentId, "Sam Student", Role.STUDENT)));
+
+    mvc.perform(get("/api/me/students").with(TestJwt.as("parent1", Role.PARENT)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].id").value(studentId.toString()))
+        .andExpect(jsonPath("$[0].displayName").value("Sam Student"))
+        .andExpect(jsonPath("$[0].role").value("STUDENT"))
+        .andExpect(jsonPath("$[0].email").doesNotExist());
+  }
+
+  @Test
+  void myStudentsIsAnEmptyListWhenThereAreNone() throws Exception {
+    CurrentUser tutor = new CurrentUser(UUID.randomUUID(), "kc-tutor1", Role.TUTOR, SCHOOL_ID);
+    when(currentUserProvider.currentUser()).thenReturn(tutor);
+    when(relationships.studentsOf(tutor)).thenReturn(List.of());
+
+    mvc.perform(get("/api/me/students").with(TestJwt.as("tutor1", Role.TUTOR)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray())
+        .andExpect(jsonPath("$").isEmpty());
   }
 }
