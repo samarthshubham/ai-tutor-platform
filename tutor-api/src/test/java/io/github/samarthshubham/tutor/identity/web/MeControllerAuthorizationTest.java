@@ -8,10 +8,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import io.github.samarthshubham.tutor.identity.api.CurrentUser;
 import io.github.samarthshubham.tutor.identity.api.CurrentUserProvider;
 import io.github.samarthshubham.tutor.identity.api.Role;
+import io.github.samarthshubham.tutor.identity.service.RelationshipService;
 import io.github.samarthshubham.tutor.identity.service.UserResponse;
 import io.github.samarthshubham.tutor.identity.service.UserService;
 import io.github.samarthshubham.tutor.support.TestJwt;
 import io.github.samarthshubham.tutor.support.WebSliceTest;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +35,7 @@ class MeControllerAuthorizationTest {
   @Autowired CurrentUserProvider currentUserProvider;
 
   @MockitoBean UserService users;
+  @MockitoBean RelationshipService relationships;
 
   @BeforeEach
   void stubUser() {
@@ -40,6 +43,7 @@ class MeControllerAuthorizationTest {
         .thenReturn(new CurrentUser(ID, "kc", Role.STUDENT, SCHOOL_ID));
     when(users.get(any()))
         .thenReturn(new UserResponse(ID, "u", "U", "u@tutor.local", Role.STUDENT, SCHOOL_ID));
+    when(relationships.studentsOf(any())).thenReturn(List.of());
   }
 
   static Stream<Arguments> getMe() {
@@ -56,6 +60,22 @@ class MeControllerAuthorizationTest {
   @MethodSource
   void getMe(String caller, int expectedStatus) throws Exception {
     mvc.perform(as(caller, get("/api/me"))).andExpect(status().is(expectedStatus));
+  }
+
+  static Stream<Arguments> getMyStudents() {
+    return Stream.of(
+        Arguments.of("ADMIN", 403),
+        Arguments.of("TEACHER", 403),
+        Arguments.of("TUTOR", 200),
+        Arguments.of("STUDENT", 403),
+        Arguments.of("PARENT", 200),
+        Arguments.of("anonymous", 401));
+  }
+
+  @ParameterizedTest(name = "GET /api/me/students as {0} -> {1}")
+  @MethodSource
+  void getMyStudents(String caller, int expectedStatus) throws Exception {
+    mvc.perform(as(caller, get("/api/me/students"))).andExpect(status().is(expectedStatus));
   }
 
   private static MockHttpServletRequestBuilder as(
