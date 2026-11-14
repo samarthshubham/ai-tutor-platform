@@ -95,7 +95,7 @@ Each block works once the story in brackets is merged.
 ```bash
 # Infrastructure (E0-S2)
 docker compose -f infra/docker-compose.yml up -d --wait
-bash infra/smoke.sh
+bash infra/smoke.sh                                    # needs curl and jq; --lifecycle also checks down / down -v (wipes data)
 docker compose -f infra/docker-compose.yml down        # keep data; add -v to wipe
 
 # tutor-api (E0-S3)
