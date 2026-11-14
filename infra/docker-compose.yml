@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: ${TUTOR_DB_PASSWORD:-tutor}
       KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak}
     ports:
-      - "5442:5432"
+      - "127.0.0.1:5442:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./postgres/create-keycloak-db.sh:/docker-entrypoint-initdb.d/create-keycloak-db.sh:ro
@@ -34,7 +34,7 @@ services:
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER:-admin}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
     ports:
-      - "8180:8080"
+      - "127.0.0.1:8180:8080"
     volumes:
       - ./keycloak/tutor-realm.json:/opt/keycloak/data/import/tutor-realm.json:ro
     healthcheck:
@@ -51,8 +51,8 @@ services:
     image: axllent/mailpit:v1.33.1
     container_name: tutor-mailpit
     ports:
-      - "1125:1025"
-      - "8125:8025"
+      - "127.0.0.1:1125:1025"
+      - "127.0.0.1:8125:8025"
     healthcheck:
       test: ["CMD", "/mailpit", "readyz"]
       interval: 10s
@@ -63,7 +63,7 @@ services:
     image: prom/prometheus:v3.16.0
     container_name: tutor-prometheus
     ports:
-      - "9191:9090"
+      - "127.0.0.1:9191:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
@@ -82,7 +82,7 @@ services:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
     ports:
-      - "3100:3000"
+      - "127.0.0.1:3100:3000"
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - grafana-data:/var/lib/grafana

@@ -28,7 +28,7 @@ Copy `.env.example` to `infra/.env` to change the dev credentials; the compose f
 | `prometheus` | `prom/prometheus:v3.16.0` | `9191` | `http://localhost:9191`, no login; scrapes `host.docker.internal:9190/actuator/prometheus` |
 | `grafana` | `grafana/grafana:13.3.1` | `3100` | `http://localhost:3100`, `admin` / `admin`; Prometheus datasource provisioned |
 
-Data lives in the named volumes `postgres-data`, `prometheus-data` and `grafana-data`. `postgres/create-keycloak-db.sh` creates the `keycloak` user and database the first time the volume is initialised.
+Every port is published on `127.0.0.1` only, so the dev credentials are not reachable from the network. Data lives in the named volumes `postgres-data`, `prometheus-data` and `grafana-data`. `postgres/create-keycloak-db.sh` creates the `keycloak` user and database the first time the volume is initialised.
 
 ## Realm `tutor`
 

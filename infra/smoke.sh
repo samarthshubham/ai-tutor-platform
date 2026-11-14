@@ -32,9 +32,9 @@ ok() {
 }
 
 psql_tutor() {
-  docker run --rm --add-host host.docker.internal:host-gateway \
+  docker run --rm --network host \
     -e PGPASSWORD="${TUTOR_DB_PASSWORD:-tutor}" -e PGOPTIONS="-c client_min_messages=warning" "$POSTGRES_IMAGE" \
-    psql -h host.docker.internal -p 5442 -U tutor -d tutor -v ON_ERROR_STOP=1 -qtAc "$1"
+    psql -h 127.0.0.1 -p 5442 -U tutor -d tutor -v ON_ERROR_STOP=1 -qtAc "$1"
 }
 
 title_case() {
