@@ -1,0 +1,7 @@
+{
+  "stepDefinitions": ["src/step-definitions/**/*.ts"],
+  "filterSpecs": true,
+  "omitFiltered": true,
+  "json": { "enabled": false },
+  "html": { "enabled": true, "output": "reports/cucumber-report.html" }
+}

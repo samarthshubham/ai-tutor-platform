@@ -42,7 +42,7 @@ Exactly one AI profile (`ollama`, `cloud`, `fake-ai`) must be active; the app re
 | `GET /api/ai/ping` | One tiny model call: `{"provider","model","reply","latencyMs"}`; `503 AI_UNAVAILABLE` on timeout |
 | `POST /api/ai/embedding` | Embeds `{"text"}` and returns the vector size: `{"provider","model","dimensions","latencyMs"}` |
 | `/actuator/health` | Health (`UP` when the app and database are fine) |
-| `/actuator/info` | Application info |
+| `/actuator/info` | Application info; `ai.chat-provider` names the active chat provider (`fake`, `ollama` or `anthropic`) |
 | `/actuator/prometheus` | Metrics for Prometheus |
 | `/v3/api-docs` | OpenAPI document |
 | `/swagger-ui/index.html` | Swagger UI |

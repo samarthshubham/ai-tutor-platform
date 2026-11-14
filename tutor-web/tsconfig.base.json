@@ -16,6 +16,7 @@
     "paths": {
       "@tutor-web/api": ["./libs/api/src/index.ts"],
       "@tutor-web/auth": ["./libs/auth/src/index.ts"],
+      "@tutor-web/e2e-support": ["./libs/e2e-support/src/index.ts"],
       "@tutor-web/ui": ["./libs/ui/src/index.ts"]
     }
   },

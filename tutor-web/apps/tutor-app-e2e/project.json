@@ -1,0 +1,13 @@
+{
+  "name": "tutor-app-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/tutor-app-e2e/src",
+  "tags": ["type:e2e"],
+  "implicitDependencies": ["tutor-app", "e2e-support"],
+  "targets": {
+    "e2e": {
+      "cache": false
+    }
+  }
+}

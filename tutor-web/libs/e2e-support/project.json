@@ -1,0 +1,19 @@
+{
+  "name": "e2e-support",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/e2e-support/src",
+  "projectType": "library",
+  "tags": ["type:lib", "scope:e2e"],
+  "targets": {
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default"],
+      "outputs": ["{workspaceRoot}/coverage/e2e-support"],
+      "options": {
+        "command": "tsc -p tsconfig.json && vitest run",
+        "cwd": "libs/e2e-support"
+      }
+    }
+  }
+}

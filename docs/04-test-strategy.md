@@ -52,5 +52,5 @@ Gates are never lowered and tests are never disabled to make a change pass.
 ```bash
 cd tutor-api && ./mvnw verify                     # unit, slice, integration, architecture, coverage gate
 cd tutor-web && npx nx run-many -t lint test build
-cd tutor-web && npx nx e2e tutor-app-e2e          # needs ./dev.sh running
+cd tutor-web && npx nx e2e tutor-app-e2e          # needs ./dev.sh running on fake-ai (AI_PROFILE=fake-ai when Ollama is up)
 ```
