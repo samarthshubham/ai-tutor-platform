@@ -54,4 +54,16 @@ Only one module talks to the model; the rest of the code sees plain Java interfa
 
 ## Running it
 
-Prerequisites: Docker, Java 21, Node 22, `curl` and `jq`, and optionally [Ollama](https://ollama.com) with a small chat model and `nomic-embed-text`. The local services (PostgreSQL, Keycloak, Mailpit, Prometheus, Grafana) start with `docker compose -f infra/docker-compose.yml up -d --wait`; see [infra/README.md](infra/README.md) and [CLAUDE.md](CLAUDE.md#commands).
+Prerequisites: Docker, Java 21, Node 22, `curl` and `jq`, and optionally [Ollama](https://ollama.com) with `llama3.2:3b` and `nomic-embed-text`.
+
+```bash
+./dev.sh                     # starts the containers, tutor-api and tutor-app, waits until each is healthy, prints URLs and demo logins
+./dev.sh status              # every service, and the AI profile tutor-api runs with
+./dev.sh logs tutor-api      # or tutor-app, postgres, keycloak, mailpit, prometheus, grafana; files are in logs/
+./dev.sh stop                # stops everything (Ctrl+C in the dev.sh terminal does the same); data is kept
+```
+
+Then open http://localhost:4300. tutor-api uses the `ollama` profile when Ollama answers on `http://localhost:11434` (`OLLAMA_URL` changes it) and the deterministic `fake-ai` profile otherwise; `AI_PROFILE=ollama|cloud|fake-ai ./dev.sh` forces one (`cloud` needs `ANTHROPIC_API_KEY`). The demo users are `admin1`, `teacher1`, `teacher2`, `tutor1`, `student1` to `student3`, `parent1` and `parent2`, with the role plus `#2026` as password (`Teacher#2026`).
+
+With the stack on `fake-ai`, `cd tutor-web && npx nx e2e tutor-app-e2e` runs the end-to-end scenarios; the `e2e` workflow runs the `@smoke` ones on every pull request that touches the code. See [infra/README.md](infra/README.md) for the containers and [CLAUDE.md](CLAUDE.md#commands) for every command.
+

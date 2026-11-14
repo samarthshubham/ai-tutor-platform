@@ -109,12 +109,16 @@ cd tutor-web
 npm ci
 npx nx serve tutor-app                                 # :4300, proxies /api and /actuator to :9190
 npx nx run-many -t lint test build
-npx nx e2e tutor-app-e2e                               # needs the stack running (E0-S5)
+npx nx e2e tutor-app-e2e                               # needs the stack running on fake-ai (E0-S5); CYPRESS_tags=@smoke for one tag
 npx nx run seed-demo-data:seed                         # (E2-S4)
 
 # Whole stack (E0-S5)
 ./dev.sh            # start; Ctrl+C stops. Never run it under `timeout`.
-./dev.sh stop | status | logs <service> | seed
+./dev.sh stop       # stops what dev.sh started and the containers (keeps data); works from another terminal
+./dev.sh status     # each container, tutor-api (with its AI profile), tutor-app, Ollama
+./dev.sh logs <service>   # tutor-api, tutor-app or a compose service; logs/ holds the files
+AI_PROFILE=fake-ai ./dev.sh   # force a profile (ollama|cloud|fake-ai); default: ollama if OLLAMA_URL answers, else fake-ai
+./dev.sh seed       # (E2-S4)
 
 # Workflow scripts
 python3 -m unittest discover -s .github/scripts -p 'test_*.py'
