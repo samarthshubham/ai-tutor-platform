@@ -16,6 +16,8 @@ public interface RelationshipQuery {
 
   Set<UUID> tutorIdsOfStudent(UUID studentId);
 
+  boolean hasRoleInSchool(UUID userId, Role role, UUID schoolId);
+
   Optional<UserSummary> findUser(UUID id);
 
   List<UserSummary> findUsers(Collection<UUID> ids);
