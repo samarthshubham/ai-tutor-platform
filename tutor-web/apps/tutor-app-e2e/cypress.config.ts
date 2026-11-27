@@ -7,14 +7,14 @@ import { defineConfig } from 'cypress';
 export default defineConfig({
   e2e: {
     ...nxE2EPreset(__filename, { cypressDir: 'src' }),
-    baseUrl: 'http://localhost:4300',
+    baseUrl: 'http://localhost:4310',
     specPattern: 'src/features/**/*.feature',
     supportFile: 'src/support/e2e.ts',
     video: false,
     env: {
       apiUrl: 'http://localhost:9190',
       keycloakUrl: 'http://localhost:8180',
-      webUrl: 'http://localhost:4300',
+      webUrl: 'http://localhost:4310',
     },
     async setupNodeEvents(on, config) {
       await addCucumberPreprocessorPlugin(on, config);

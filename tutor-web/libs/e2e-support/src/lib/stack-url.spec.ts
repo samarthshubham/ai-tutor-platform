@@ -10,7 +10,7 @@ describe('stackUrl', () => {
 
     expect(stackUrl('apiUrl')).toBe('http://localhost:9190');
     expect(stackUrl('keycloakUrl')).toBe('http://localhost:8180');
-    expect(stackUrl('webUrl')).toBe('http://localhost:4300');
+    expect(stackUrl('webUrl')).toBe('http://localhost:4310');
   });
 
   it('uses the Cypress env value when one is set', () => {
@@ -20,9 +20,9 @@ describe('stackUrl', () => {
   });
 
   it('ignores empty and non-string env values', () => {
-    stubCypress({ apiUrl: '', webUrl: 4300 });
+    stubCypress({ apiUrl: '', webUrl: 4310 });
 
     expect(stackUrl('apiUrl')).toBe('http://localhost:9190');
-    expect(stackUrl('webUrl')).toBe('http://localhost:4300');
+    expect(stackUrl('webUrl')).toBe('http://localhost:4310');
   });
 });

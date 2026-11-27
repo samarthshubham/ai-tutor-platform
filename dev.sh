@@ -14,7 +14,7 @@ COMPOSE_SERVICES=(postgres keycloak mailpit prometheus grafana)
 APP_SERVICES=(tutor-api tutor-app)
 AI_PROFILES=(ollama cloud fake-ai)
 API_URL=http://localhost:9190
-WEB_URL=http://localhost:4300
+WEB_URL=http://localhost:4310
 OLLAMA_URL="${OLLAMA_URL:-http://localhost:11434}"
 API_WAIT_SECONDS="${API_WAIT_SECONDS:-300}"
 WEB_WAIT_SECONDS="${WEB_WAIT_SECONDS:-300}"
@@ -203,7 +203,7 @@ start() {
     fi
   done
   port_in_use 9190 && { err "port 9190 is taken by a process dev.sh did not start; stop it first"; exit 1; }
-  port_in_use 4300 && { err "port 4300 is taken by a process dev.sh did not start; stop it first"; exit 1; }
+  port_in_use 4310 && { err "port 4310 is taken by a process dev.sh did not start; stop it first"; exit 1; }
 
   mkdir -p "$LOG_DIR"
   : >"$PID_FILE"
@@ -225,7 +225,7 @@ start() {
   wait_until tutor-api "$API_WAIT_SECONDS" api_healthy
   ok "tutor-api healthy on $API_URL (logs/tutor-api.log)"
 
-  section "tutor-app on :4300"
+  section "tutor-app on :4310"
   if [[ ! -d "$ROOT/tutor-web/node_modules" ]]; then
     note "installing frontend dependencies (npm ci, logs/npm-ci.log)"
     (cd "$ROOT/tutor-web" && npm ci --no-audit --no-fund >"$LOG_DIR/npm-ci.log" 2>&1) ||

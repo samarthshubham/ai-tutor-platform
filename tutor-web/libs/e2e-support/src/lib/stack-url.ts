@@ -1,7 +1,7 @@
 const DEFAULT_URLS = {
   apiUrl: 'http://localhost:9190',
   keycloakUrl: 'http://localhost:8180',
-  webUrl: 'http://localhost:4300',
+  webUrl: 'http://localhost:4310',
 } as const;
 
 export type StackUrl = keyof typeof DEFAULT_URLS;

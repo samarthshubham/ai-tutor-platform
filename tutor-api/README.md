@@ -37,7 +37,7 @@ Exactly one AI profile (`ollama`, `cloud`, `fake-ai`) must be active; the app re
 
 ## Security
 
-tutor-api is a stateless OAuth2 resource server for the Keycloak realm `tutor` (`tutor.security.issuer-uri`, default `http://localhost:8180/realms/tutor`). Every request needs `Authorization: Bearer <access token>` except `/actuator/health/**`, `/actuator/prometheus`, `/v3/api-docs/**` and `/swagger-ui/**`. The token's `realm_access.roles` must hold exactly one of `ADMIN`, `TEACHER`, `TUTOR`, `STUDENT`, `PARENT`; otherwise the answer is `403`. CORS allows `http://localhost:4300` (`tutor.security.allowed-origins`). The first request that needs the current user creates its `app_user` row.
+tutor-api is a stateless OAuth2 resource server for the Keycloak realm `tutor` (`tutor.security.issuer-uri`, default `http://localhost:8180/realms/tutor`). Every request needs `Authorization: Bearer <access token>` except `/actuator/health/**`, `/actuator/prometheus`, `/v3/api-docs/**` and `/swagger-ui/**`. The token's `realm_access.roles` must hold exactly one of `ADMIN`, `TEACHER`, `TUTOR`, `STUDENT`, `PARENT`; otherwise the answer is `403`. CORS allows `http://localhost:4310` (`tutor.security.allowed-origins`). The first request that needs the current user creates its `app_user` row.
 
 ```bash
 TOKEN=$(curl -s http://localhost:8180/realms/tutor/protocol/openid-connect/token \

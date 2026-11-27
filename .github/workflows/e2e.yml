@@ -89,7 +89,7 @@ jobs:
         run: |
           nohup npx nx serve tutor-app --configuration=production >"$LOGS/tutor-app.log" 2>&1 &
           for _ in $(seq 1 90); do
-            curl -fsS http://localhost:4300/ | grep -q '<tp-root' && exit 0
+            curl -fsS http://localhost:4310/ | grep -q '<tp-root' && exit 0
             sleep 2
           done
           cat "$LOGS/tutor-app.log"

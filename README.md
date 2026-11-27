@@ -63,7 +63,9 @@ Prerequisites: Docker, Java 21, Node 22, `curl` and `jq`, and optionally [Ollama
 ./dev.sh stop                # stops everything (Ctrl+C in the dev.sh terminal does the same); data is kept
 ```
 
-Then open http://localhost:4300. tutor-api uses the `ollama` profile when Ollama answers on `http://localhost:11434` (`OLLAMA_URL` changes it) and the deterministic `fake-ai` profile otherwise; `AI_PROFILE=ollama|cloud|fake-ai ./dev.sh` forces one (`cloud` needs `ANTHROPIC_API_KEY`). The demo users are `admin1`, `teacher1`, `teacher2`, `tutor1`, `student1` to `student3`, `parent1` and `parent2`, with the role plus `#2026` as password (`Teacher#2026`).
+Then open http://localhost:4310. tutor-api uses the `ollama` profile when Ollama answers on `http://localhost:11434` (`OLLAMA_URL` changes it) and the deterministic `fake-ai` profile otherwise; `AI_PROFILE=ollama|cloud|fake-ai ./dev.sh` forces one (`cloud` needs `ANTHROPIC_API_KEY`). The demo users are `admin1`, `teacher1`, `teacher2`, `tutor1`, `student1` to `student3`, `parent1` and `parent2`, with the role plus `#2026` as password (`Teacher#2026`).
+
+If your local Keycloak realm already exists, [update the web client settings](infra/README.md#realm-tutor) before signing in on the new port.
 
 With the stack on `fake-ai`, `cd tutor-web && npx nx e2e tutor-app-e2e` runs the end-to-end scenarios; the `e2e` workflow runs the `@smoke` ones on every pull request that touches the code. See [infra/README.md](infra/README.md) for the containers and [CLAUDE.md](CLAUDE.md#commands) for every command.
 
