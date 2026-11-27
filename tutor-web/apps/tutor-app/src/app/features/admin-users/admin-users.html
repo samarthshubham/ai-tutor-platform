@@ -1,0 +1,70 @@
+<tp-page-header
+  title="Users"
+  subtitle="Everyone who has signed in to the school"
+/>
+
+<form class="filters" [formGroup]="filters">
+  <mat-form-field>
+    <mat-label>Role</mat-label>
+    <mat-select formControlName="role">
+      <mat-option value="">All roles</mat-option>
+      @for (role of roles; track role) {
+      <mat-option [value]="role">{{ roleLabel(role) }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Search</mat-label>
+    <input matInput type="search" formControlName="q" />
+  </mat-form-field>
+</form>
+
+@if (errorState(); as error) {
+<tp-error-banner [error]="error" (retry)="retry()" />
+} @else if (readyPage(); as page) { @if (page.content.length === 0) {
+<tp-empty-state
+  title="No users found"
+  message="Change the filters, or ask people to sign in once so they appear here."
+/>
+} @else {
+<table mat-table [dataSource]="page.content" aria-label="Users">
+  <ng-container matColumnDef="displayName">
+    <th mat-header-cell *matHeaderCellDef>Name</th>
+    <td mat-cell *matCellDef="let user">{{ user.displayName }}</td>
+  </ng-container>
+  <ng-container matColumnDef="username">
+    <th mat-header-cell *matHeaderCellDef>Username</th>
+    <td mat-cell *matCellDef="let user">{{ user.username }}</td>
+  </ng-container>
+  <ng-container matColumnDef="role">
+    <th mat-header-cell *matHeaderCellDef>Role</th>
+    <td mat-cell *matCellDef="let user">{{ roleLabel(user.role) }}</td>
+  </ng-container>
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>Links</th>
+    <td mat-cell *matCellDef="let user">
+      @if (canManageLinks(user)) {
+      <button
+        matButton
+        type="button"
+        [attr.aria-label]="'Manage links of ' + user.displayName"
+        (click)="manageLinks(user)"
+      >
+        Manage links
+      </button>
+      }
+    </td>
+  </ng-container>
+  <tr mat-header-row *matHeaderRowDef="columns"></tr>
+  <tr mat-row *matRowDef="let row; columns: columns"></tr>
+</table>
+<mat-paginator
+  [length]="page.totalElements"
+  [pageSize]="page.size"
+  [pageIndex]="page.page"
+  [hidePageSize]="true"
+  (page)="changePage($event)"
+/>
+} } @else {
+<tp-loading label="Loading users…" />
+}

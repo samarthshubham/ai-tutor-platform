@@ -1,5 +1,6 @@
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
+@if (auth.user(); as user) {
 <mat-toolbar class="top-bar">
   <button
     matIconButton
@@ -12,6 +13,23 @@
     <mat-icon aria-hidden="true">menu</mat-icon>
   </button>
   <span class="app-name">AI Tutor</span>
+  <span class="spacer"></span>
+  <button
+    matButton
+    type="button"
+    class="user-menu-button"
+    data-testid="user-menu"
+    [matMenuTriggerFor]="userMenu"
+  >
+    <mat-icon aria-hidden="true">account_circle</mat-icon>
+    {{ user.displayName }}
+  </button>
+  <mat-menu #userMenu="matMenu">
+    <p class="menu-role" data-testid="user-role">{{ roleLabel() }}</p>
+    <button mat-menu-item type="button" (click)="auth.logout()">
+      Sign out
+    </button>
+  </mat-menu>
 </mat-toolbar>
 
 <mat-sidenav-container class="layout">
@@ -22,7 +40,7 @@
     class="side-navigation"
   >
     <mat-nav-list aria-label="Main navigation">
-      @for (item of navigation; track item.path) {
+      @for (item of navigation(); track item.path) {
       <a
         mat-list-item
         [routerLink]="item.path"
@@ -44,3 +62,12 @@
     </main>
   </mat-sidenav-content>
 </mat-sidenav-container>
+} @else {
+<main id="main-content" class="content" tabindex="-1">
+  @if (auth.error(); as error) {
+  <tp-error-banner [error]="error" (retry)="reload()" />
+  } @else {
+  <tp-loading label="Checking your session…" />
+  }
+</main>
+}

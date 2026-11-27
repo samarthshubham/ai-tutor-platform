@@ -10,6 +10,8 @@ import {
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { apiErrorInterceptor } from '@tutor-web/api';
+import { authInterceptor, provideTutorAuth } from '@tutor-web/auth';
+import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -17,6 +19,10 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(appRoutes),
-    provideHttpClient(withFetch(), withInterceptors([apiErrorInterceptor])),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([apiErrorInterceptor, authInterceptor]),
+    ),
+    provideTutorAuth(environment.auth),
   ],
 };

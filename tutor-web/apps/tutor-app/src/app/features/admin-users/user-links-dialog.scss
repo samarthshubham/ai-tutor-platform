@@ -1,0 +1,31 @@
+.link-section {
+  margin-bottom: 16px;
+
+  h3 {
+    margin: 0 0 8px;
+    font: var(--mat-sys-title-medium);
+  }
+}
+
+.none {
+  margin: 0 0 8px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+ul {
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.add-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}

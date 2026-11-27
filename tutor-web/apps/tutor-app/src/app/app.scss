@@ -29,6 +29,17 @@
   font: var(--mat-sys-title-large);
 }
 
+.spacer {
+  flex: 1;
+}
+
+.menu-role {
+  margin: 0;
+  padding: 8px 16px;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-large);
+}
+
 .layout {
   flex: 1;
 }
