@@ -1,0 +1,55 @@
+<h2 mat-dialog-title>Links of {{ user.displayName }}</h2>
+
+<mat-dialog-content>
+  @if (error(); as error) {
+  <tp-error-banner [error]="error" (retry)="load()" />
+  } @if (loading()) {
+  <tp-loading label="Loading links…" />
+  } @else { @for (section of sections; track section.key) {
+  <section class="link-section" [attr.aria-label]="section.title">
+    <h3>{{ section.title }}</h3>
+    @if (rowsOf(section).length === 0) {
+    <p class="none">None yet.</p>
+    } @else {
+    <ul>
+      @for (row of rowsOf(section); track row.linkId) {
+      <li>
+        <span>{{ nameOf(row.counterpartId) }}</span>
+        <button
+          matButton
+          type="button"
+          [disabled]="busy()"
+          [attr.aria-label]="'Remove ' + nameOf(row.counterpartId)"
+          (click)="remove(section, row)"
+        >
+          Remove
+        </button>
+      </li>
+      }
+    </ul>
+    }
+    <div class="add-row">
+      <mat-form-field>
+        <mat-label>{{ section.addLabel }}</mat-label>
+        <mat-select [formControl]="section.choice">
+          @for (option of optionsFor(section); track option.id) {
+          <mat-option [value]="option.id">{{ option.displayName }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <button
+        matButton="filled"
+        type="button"
+        [disabled]="busy() || section.choice.value === ''"
+        (click)="add(section)"
+      >
+        Add
+      </button>
+    </div>
+  </section>
+  } }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button matButton type="button" mat-dialog-close>Close</button>
+</mat-dialog-actions>

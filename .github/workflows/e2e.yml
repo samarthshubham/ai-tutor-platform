@@ -95,7 +95,7 @@ jobs:
           cat "$LOGS/tutor-app.log"
           exit 1
 
-      - name: Run the @smoke scenarios
+      - name: Run the @smoke scenarios (API checks and the @ui sign-in)
         working-directory: tutor-web
         env:
           CYPRESS_tags: '@smoke'

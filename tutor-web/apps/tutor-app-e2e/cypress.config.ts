@@ -9,7 +9,7 @@ export default defineConfig({
     ...nxE2EPreset(__filename, { cypressDir: 'src' }),
     baseUrl: 'http://localhost:4300',
     specPattern: 'src/features/**/*.feature',
-    supportFile: false,
+    supportFile: 'src/support/e2e.ts',
     video: false,
     env: {
       apiUrl: 'http://localhost:9190',

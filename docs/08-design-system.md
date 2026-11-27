@@ -15,7 +15,7 @@ One Angular 21 app, `tutor-app`, serves all five roles. The navigation and the h
 
 ## 2. Shell
 
-Top bar: app name, notification bell with unread count, user menu (display name, role, sign out). Side navigation by role:
+Top bar: app name, notification bell with unread count, user menu (display name, role, sign out). Side navigation by role. An item is shown only once its route exists; a role with no item yet sees a single Home item (`/home`):
 
 | Role | Items |
 |---|---|
@@ -30,6 +30,7 @@ Top bar: app name, notification bell with unread count, user menu (display name,
 | Route | Roles | Screen | Story |
 |---|---|---|---|
 | `/` | all | Redirects to the role's first navigation item | E1-S4 |
+| `/home` | all | Landing page for a role whose own screens do not exist yet; shows the API status | E1-S4 |
 | `/forbidden` | all | "You don't have access" page | E1-S4 |
 | `/admin/users` | A | Users table with role filter; guardian and tutor link dialogs | E1-S4 |
 | `/courses` | A, T, S | Course cards | E2-S3 |
