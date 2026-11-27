@@ -50,7 +50,7 @@
       "continuous": true,
       "executor": "@angular/build:dev-server",
       "options": {
-        "port": 4300,
+        "port": 4310,
         "proxyConfig": "apps/tutor-app/proxy.conf.json"
       },
       "configurations": {

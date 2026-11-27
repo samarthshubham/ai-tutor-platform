@@ -30,7 +30,7 @@ The design docs are binding. If the code must differ, change the doc in the same
 ## Architecture
 
 ```
-tutor-app (Angular 21, tutor-web/, :4300)  --OIDC code flow + PKCE-->  Keycloak (:8180, realm tutor)
+tutor-app (Angular 21, tutor-web/, :4310)  --OIDC code flow + PKCE-->  Keycloak (:8180, realm tutor)
     |  REST JSON + SSE, Bearer JWT
 tutor-api (Spring Boot 4.1, Java 21, Spring AI 2.0, :9190)
     |-- PostgreSQL 16 + pgvector (:5442, db tutor)      |-- Mailpit (SMTP :1125, UI :8125)
@@ -107,7 +107,7 @@ cd tutor-api
 # tutor-web (E0-S4)
 cd tutor-web
 npm ci
-npx nx serve tutor-app                                 # :4300, proxies /api and /actuator to :9190
+npx nx serve tutor-app                                 # :4310, proxies /api and /actuator to :9190
 npx nx run-many -t lint test build
 npx nx e2e tutor-app-e2e                               # needs the stack running on fake-ai (E0-S5); CYPRESS_tags=@smoke for one tag
 npx nx run seed-demo-data:seed                         # (E2-S4)
