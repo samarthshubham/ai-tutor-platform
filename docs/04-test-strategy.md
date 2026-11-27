@@ -8,7 +8,7 @@ No test ever calls a real model. Tests and CI run with the `fake-ai` profile (se
 |---|---|---|---|
 | **unit** | One class's logic | JUnit 5 + Mockito, no Spring context | `<Class>Test` |
 | **web slice** | Request mapping, validation, error bodies, role checks | `@WebMvcTest` with the security config and mocked services | `<Controller>Test` |
-| **authorization matrix** | Every endpoint against all five roles and anonymous | Parameterized web slice test, one row per role with the expected status | `<Controller>AuthorizationTest` |
+| **authorization matrix** | Every endpoint against all five roles and anonymous | Web slice with `AuthorizationMatrix`: supply a fresh request per caller, declare the expected status for each role and anonymous, and verify all rows together | `<Controller>AuthorizationTest` |
 | **integration** | Repositories, Flyway, transactions, events, pgvector | `@SpringBootTest` + Testcontainers `pgvector/pgvector:pg16`, profiles `test,fake-ai` | `<Feature>IT` |
 | **architecture** | Module boundaries and the Spring AI import rule | ArchUnit | `ModuleBoundaryTest` |
 | **frontend unit** | Components, services, guards | Vitest + Angular Testing Library style queries | `*.spec.ts` |

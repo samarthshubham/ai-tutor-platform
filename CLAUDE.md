@@ -64,7 +64,7 @@ docs/          design docs, ADRs, roadmap, study guide
 - No model call inside a database transaction. Slow AI work runs after commit, asynchronously, with a status that can fail and be retried.
 - Every model call goes through `AiCallLogger`. Model output is validated in code before it is stored.
 - No test and no CI job calls a real model: use the `fake-ai` profile and `FakeChatModel`.
-- Every endpoint has a role check and a row per role in an authorization matrix test. Ownership goes through `AccessPolicy` or `CourseAccess`; hidden data is `404`.
+- Every endpoint has a role check and an `AuthorizationMatrix` web slice test covering all five roles and anonymous. Ownership goes through `AccessPolicy` or `CourseAccess`; hidden data is `404`.
 - Student and parent responses never carry a reference answer or rubric.
 - Controllers return records, never entities. Errors go through the shared exceptions and `ErrorResponse`.
 - Time comes from the injected `Clock`. Ids are UUIDs.

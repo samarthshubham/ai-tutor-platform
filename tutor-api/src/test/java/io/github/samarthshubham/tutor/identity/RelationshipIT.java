@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
+import io.github.samarthshubham.tutor.identity.api.AccessPolicy;
+import io.github.samarthshubham.tutor.identity.api.CurrentUser;
 import io.github.samarthshubham.tutor.identity.api.RelationshipQuery;
 import io.github.samarthshubham.tutor.identity.api.Role;
 import io.github.samarthshubham.tutor.identity.api.UserSummary;
@@ -27,12 +29,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.transaction.annotation.Transactional;
 
 class RelationshipIT extends IntegrationTest {
 
   @Autowired MockMvc mvc;
   @Autowired JdbcTemplate jdbc;
   @Autowired RelationshipQuery relationships;
+  @Autowired AccessPolicy access;
 
   private String run;
   private String adminToken;
@@ -148,6 +152,33 @@ class RelationshipIT extends IntegrationTest {
     mvc.perform(get("/api/me/students").header(HttpHeaders.AUTHORIZATION, lonelyTutorToken))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isEmpty());
+  }
+
+  @Test
+  @Transactional
+  void aGuardianLinkGrantsAccessOnlyWhileTheTargetIsAStudentInTheSameSchool() throws Exception {
+    String username = "parent-" + run;
+    UUID parent = signIn(TestJwt.bearer(username, "PARENT"));
+    UUID student = signIn("student", "STUDENT");
+    UUID school =
+        jdbc.queryForObject("select school_id from app_user where id = ?", UUID.class, parent);
+    CurrentUser guardian =
+        new CurrentUser(parent, TestJwt.keycloakId(username), Role.PARENT, school);
+
+    assertThat(access.canSeeStudent(guardian, student)).isFalse();
+    createLink("/api/guardian-links", "parentId", parent, student).andExpect(status().isCreated());
+    assertThat(access.canSeeStudent(guardian, student)).isTrue();
+
+    UUID otherSchool = UUID.randomUUID();
+    jdbc.update(
+        "insert into school (id, name, created_at) values (?, ?, now())",
+        otherSchool,
+        "Other campus");
+    jdbc.update("update app_user set school_id = ? where id = ?", otherSchool, student);
+    assertThat(access.canSeeStudent(guardian, student)).isFalse();
+    jdbc.update(
+        "update app_user set school_id = ?, role = 'TEACHER' where id = ?", school, student);
+    assertThat(access.canSeeStudent(guardian, student)).isFalse();
   }
 
   @Test

@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.samarthshubham.tutor.common.api.PageResponse;
 import io.github.samarthshubham.tutor.identity.api.CurrentUser;
@@ -14,20 +13,16 @@ import io.github.samarthshubham.tutor.identity.api.CurrentUserProvider;
 import io.github.samarthshubham.tutor.identity.api.Role;
 import io.github.samarthshubham.tutor.identity.service.RelationshipService;
 import io.github.samarthshubham.tutor.identity.service.TutorAssignmentResponse;
-import io.github.samarthshubham.tutor.support.TestJwt;
+import io.github.samarthshubham.tutor.support.AuthorizationMatrix;
 import io.github.samarthshubham.tutor.support.WebSliceTest;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @WebSliceTest(TutorAssignmentController.class)
 class TutorAssignmentControllerAuthorizationTest {
@@ -50,56 +45,32 @@ class TutorAssignmentControllerAuthorizationTest {
         .thenReturn(new TutorAssignmentResponse(ID, ID, ID));
   }
 
-  static Stream<Arguments> adminOnly(int adminStatus) {
-    return Stream.of(
-        Arguments.of("ADMIN", adminStatus),
-        Arguments.of("TEACHER", 403),
-        Arguments.of("TUTOR", 403),
-        Arguments.of("STUDENT", 403),
-        Arguments.of("PARENT", 403),
-        Arguments.of("anonymous", 401));
+  @Test
+  void listAssignments() {
+    new AuthorizationMatrix(mvc, () -> get("/api/tutor-assignments"))
+        .expect(200, Role.ADMIN)
+        .expect(403, Role.TEACHER, Role.TUTOR, Role.STUDENT, Role.PARENT)
+        .verify(401);
   }
 
-  static Stream<Arguments> listAssignments() {
-    return adminOnly(200);
-  }
-
-  static Stream<Arguments> createAssignment() {
-    return adminOnly(201);
-  }
-
-  static Stream<Arguments> deleteAssignment() {
-    return adminOnly(204);
-  }
-
-  @ParameterizedTest(name = "GET /api/tutor-assignments as {0} -> {1}")
-  @MethodSource
-  void listAssignments(String caller, int expectedStatus) throws Exception {
-    mvc.perform(as(caller, get("/api/tutor-assignments"))).andExpect(status().is(expectedStatus));
-  }
-
-  @ParameterizedTest(name = "POST /api/tutor-assignments as {0} -> {1}")
-  @MethodSource
-  void createAssignment(String caller, int expectedStatus) throws Exception {
-    String body = "{\"tutorId\":\"" + ID + "\",\"studentId\":\"" + ID + "\"}";
-    mvc.perform(
-            as(
-                caller,
+  @Test
+  void createAssignment() {
+    new AuthorizationMatrix(
+            mvc,
+            () ->
                 post("/api/tutor-assignments")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(body)))
-        .andExpect(status().is(expectedStatus));
+                    .content("{\"tutorId\":\"" + ID + "\",\"studentId\":\"" + ID + "\"}"))
+        .expect(201, Role.ADMIN)
+        .expect(403, Role.TEACHER, Role.TUTOR, Role.STUDENT, Role.PARENT)
+        .verify(401);
   }
 
-  @ParameterizedTest(name = "DELETE /api/tutor-assignments/<id> as {0} -> {1}")
-  @MethodSource
-  void deleteAssignment(String caller, int expectedStatus) throws Exception {
-    mvc.perform(as(caller, delete("/api/tutor-assignments/" + ID)))
-        .andExpect(status().is(expectedStatus));
-  }
-
-  private static MockHttpServletRequestBuilder as(
-      String caller, MockHttpServletRequestBuilder request) {
-    return "anonymous".equals(caller) ? request : request.with(TestJwt.as(Role.valueOf(caller)));
+  @Test
+  void deleteAssignment() {
+    new AuthorizationMatrix(mvc, () -> delete("/api/tutor-assignments/" + ID))
+        .expect(204, Role.ADMIN)
+        .expect(403, Role.TEACHER, Role.TUTOR, Role.STUDENT, Role.PARENT)
+        .verify(401);
   }
 }
