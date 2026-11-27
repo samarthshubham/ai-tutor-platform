@@ -32,10 +32,12 @@ Every port is published on `127.0.0.1` only, so the dev credentials are not reac
 
 ## Realm `tutor`
 
-Imported from `keycloak/tutor-realm.json` on start when the realm does not exist yet (`start-dev --import-realm`). After editing the file, run `down -v` and start again to re-import it.
+Imported from `keycloak/tutor-realm.json` on start when the realm does not exist yet (`start-dev --import-realm`). Keycloak leaves existing realms in place on startup.
+
+If you already have a local realm, open the Keycloak admin console, select the `tutor` realm, then open **Clients → tutor-web → Settings**. Update **Valid redirect URIs** and **Valid post logout redirect URIs** to `http://localhost:4310/*`, set **Web origins** to `http://localhost:4310`, and save. This keeps your local database and realm users.
 
 - Realm roles `ADMIN`, `TEACHER`, `TUTOR`, `STUDENT`, `PARENT`; access tokens live 15 minutes.
-- Client `tutor-web`: public, authorization code flow with PKCE `S256`, redirect `http://localhost:4300/*`, web origin `http://localhost:4300`.
+- Client `tutor-web`: public, authorization code flow with PKCE `S256`, redirect `http://localhost:4310/*`, web origin `http://localhost:4310`.
 - Client `tutor-cli`: public, direct access grants (password grant) only; for the seed, e2e and curl.
 
 | Username | Name | Role | Password |

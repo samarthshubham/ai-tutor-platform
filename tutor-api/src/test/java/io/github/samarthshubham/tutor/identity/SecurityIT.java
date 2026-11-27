@@ -116,12 +116,12 @@ class SecurityIT extends IntegrationTest {
   void corsAllowsTheWebApp() throws Exception {
     mvc.perform(
             options("/api/me")
-                .header(HttpHeaders.ORIGIN, "http://localhost:4300")
+                .header(HttpHeaders.ORIGIN, "http://localhost:4310")
                 .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET")
                 .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "authorization"))
         .andExpect(status().isOk())
         .andExpect(
-            header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:4300"));
+            header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:4310"));
   }
 
   @Test

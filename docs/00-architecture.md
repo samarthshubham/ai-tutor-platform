@@ -5,7 +5,7 @@ AI Tutor Platform is a practice platform for schools and tutors. Teachers publis
 ## System
 
 ```
-tutor-app (Angular 21, Nx workspace tutor-web/, :4300)
+tutor-app (Angular 21, Nx workspace tutor-web/, :4310)
     |  OIDC authorization code + PKCE            --> Keycloak 26 (:8180, realm "tutor")
     |  REST JSON + Server-Sent Events, Bearer JWT
 tutor-api (Spring Boot 4.1, Java 21, Spring AI 2.0, :9190)

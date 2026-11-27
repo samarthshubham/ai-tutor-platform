@@ -176,7 +176,7 @@ Labels: `infra` · Size: S · Blocked by: E0-S1
   - `keycloak`: current stable 26.x image pinned by tag, host port 8180, `start-dev --import-realm`, realm file `infra/keycloak/tutor-realm.json`, database `keycloak`, healthcheck.
   - `mailpit`: SMTP 1125, UI 8125.
   - `prometheus`: host port 9191, scrapes `host.docker.internal:9190/actuator/prometheus`. `grafana`: host port 3100, Prometheus datasource provisioned, admin/admin.
-  - Realm `tutor`: realm roles `ADMIN, TEACHER, TUTOR, STUDENT, PARENT`; the nine users of §5 with one role each, email `<username>@tutor.local`, first and last name set; public client `tutor-web` (standard flow, PKCE S256, redirect `http://localhost:4300/*`, web origin `http://localhost:4300`); public client `tutor-cli` (direct access grants only) for seed, e2e and curl; access token lifetime 15 minutes.
+  - Realm `tutor`: realm roles `ADMIN, TEACHER, TUTOR, STUDENT, PARENT`; the nine users of §5 with one role each, email `<username>@tutor.local`, first and last name set; public client `tutor-web` (standard flow, PKCE S256, redirect `http://localhost:4310/*`, web origin `http://localhost:4310`); public client `tutor-cli` (direct access grants only) for seed, e2e and curl; access token lifetime 15 minutes.
 - **Data:** the realm file is the demo user data of §5.
 - **Notes:**
   - Passwords in the realm file are dev-only and documented in §5; say so at the top of `infra/README.md`.
@@ -245,7 +245,7 @@ Labels: `frontend` · Size: M · Blocked by: E0-S1
 - **Scope:** Nx workspace `tutor-web` with app `tutor-app` and libraries `api`, `ui`, `auth` (empty shell), Material theme, shell layout, error handling, proxy.
 - **Out of scope:** sign-in and guards (E1-S4), the e2e project and the seed app (E0-S5, E2-S4), every feature screen.
 - **Contract:**
-  - `npx nx serve tutor-app` on port 4300; `/api` and `/actuator` proxied to `http://localhost:9190`.
+  - `npx nx serve tutor-app` on port 4310; `/api` and `/actuator` proxied to `http://localhost:9190`.
   - `libs/ui`: `tp-loading`, `tp-empty-state` (inputs `title`, `message`, optional action), `tp-error-banner` (input `error: ApiError`, output `retry`), `tp-page-header`.
   - `libs/api`: `ApiError` (`status, code, message, fields?`), `Page<T>`, `apiErrorInterceptor` that turns an `HttpErrorResponse` into `ApiError` (a network failure becomes code `NETWORK`), `SseClient` per design system §5 with unit tests against a mocked `fetch`.
   - Shell: top bar and side navigation from design system §2, with a placeholder navigation list and a home page reading `/actuator/health` through the proxy to show "API: UP".
@@ -257,7 +257,7 @@ Labels: `frontend` · Size: M · Blocked by: E0-S1
   - Commit `package-lock.json`. No dependency beyond what the contract needs.
 - **AC**
   - [ ] `npm ci && npx nx run-many -t lint test build` passes with zero lint warnings and the coverage thresholds met
-  - [ ] `npx nx serve tutor-app` shows the shell at `http://localhost:4300`, and "API: UP" when tutor-api runs
+  - [ ] `npx nx serve tutor-app` shows the shell at `http://localhost:4310`, and "API: UP" when tutor-api runs
   - [ ] With the API stopped the home page shows the error banner with a retry button that works once the API is back
   - [ ] `SseClient` emits parsed events, ignores comment lines, completes when the stream ends and aborts the fetch on unsubscribe
   - [ ] Light and dark schemes both render from the Material theme
@@ -287,14 +287,14 @@ Labels: `infra` `ci` `testing` · Size: M · Blocked by: E0-S2, E0-S3, E0-S4, E0
   - Never run `./dev.sh start` under `timeout`: its trap tears the stack down.
   - After this story merges, add `e2e` to the required checks.
 - **AC**
-  - [ ] `./dev.sh` from a clean checkout ends with the API healthy on 9190 and the web app on 4300, and prints URLs and logins
+  - [ ] `./dev.sh` from a clean checkout ends with the API healthy on 9190 and the web app on 4310, and prints URLs and logins
   - [ ] `./dev.sh stop` leaves no process or container from the stack running; `./dev.sh status` reports each service
   - [ ] With Ollama not running the API starts with `fake-ai` and says so in the output
   - [ ] `npx nx e2e tutor-app-e2e` passes against the running stack
   - [ ] The `e2e` workflow passes on this story's pull request
   - [ ] `CLAUDE.md` and the root `README.md` document `dev.sh`
 - **Tests:** e2e `smoke.feature` (`@api @smoke`); frontend unit specs for `e2e-support`
-- **Demo:** `./dev.sh`, then open `http://localhost:4300`.
+- **Demo:** `./dev.sh`, then open `http://localhost:4310`.
 - **Refs:** NFR-AI-1
 - **Tasks**
   - [ ] `dev.sh`
@@ -354,7 +354,7 @@ Labels: `backend` `security` `auth` · Size: M · Blocked by: E0-S3, E0-S6
 - **Scope:** `identity` module: security configuration, JWT role converter, `app_user` provisioning, `CurrentUser`, `GET /api/me`, test JWT support; secure `/api/ai/ping` and `/api/ai/embedding` for `ADMIN`, and make `scripts/bench-llm.sh` send a bearer token.
 - **Out of scope:** user listing and links (E1-S2), `AccessPolicy` (E1-S3), the web sign-in (E1-S4).
 - **Contract:**
-  - Resource server with issuer `http://localhost:8180/realms/tutor` (`tutor.security.issuer-uri`), stateless, CSRF off, CORS for `http://localhost:4300`.
+  - Resource server with issuer `http://localhost:8180/realms/tutor` (`tutor.security.issuer-uri`), stateless, CSRF off, CORS for `http://localhost:4310`.
   - Open paths: `/actuator/health/**`, `/actuator/prometheus`, `/v3/api-docs/**`, `/swagger-ui/**`. Everything else needs a token.
   - `realm_access.roles` entries that match the five roles become `ROLE_<name>`; other entries are ignored. A token with none or more than one of the five roles is `403`.
   - `identity.api.CurrentUser(UUID id, String keycloakId, Role role, UUID schoolId)`, `identity.api.Role`, `identity.api.CurrentUserProvider`. A `HandlerMethodArgumentResolver` lets controllers declare a `CurrentUser` parameter.

@@ -17,7 +17,7 @@ Lint boundaries: the app imports only libraries, never `e2e-support`; `api` and 
 
 ```bash
 npm ci                                   # install exactly what package-lock.json pins
-npx nx serve tutor-app                   # http://localhost:4300; /api and /actuator proxy to tutor-api on :9190
+npx nx serve tutor-app                   # http://localhost:4310; /api and /actuator proxy to tutor-api on :9190
 npx nx run-many -t lint test build       # every gate: zero lint warnings, coverage thresholds, production build
 npx nx test api                          # one project's unit tests (Vitest) with coverage
 npx nx lint tutor-app
