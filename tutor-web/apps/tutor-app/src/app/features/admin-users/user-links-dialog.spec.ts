@@ -78,7 +78,7 @@ describe('UserLinksDialog', () => {
     };
     const everyone = [SAM, SARA, PAT, PRIYA, UMA];
     const users = {
-      list: vi.fn(({ role }: { role: User['role'] }) =>
+      list: vi.fn(({ role }: { role: User['role']; page?: number }) =>
         of(page(everyone.filter((u) => u.role === role))),
       ),
     };
@@ -318,5 +318,35 @@ describe('UserLinksDialog', () => {
     expect(el.querySelector('[role="alert"]')?.textContent).toContain(
       CONFLICT.message,
     );
+  });
+
+  it('should load every page of candidates so no user is missing', async () => {
+    const { users } = setup(PAT);
+    const students = Array.from({ length: 150 }, (_, i) =>
+      user(`student-${i}`, `Student ${i}`, 'STUDENT'),
+    );
+    users.list.mockImplementation(
+      ({ page = 0 }: { role: User['role']; page?: number }) =>
+        of({
+          content: students.slice(page * 100, page * 100 + 100),
+          page,
+          size: 100,
+          totalElements: 150,
+          totalPages: 2,
+        }),
+    );
+    const { fixture, el } = await render();
+
+    el.querySelector<HTMLElement>(
+      'section[aria-label="Children"] mat-select',
+    )?.click();
+    await fixture.whenStable();
+
+    expect(users.list).toHaveBeenCalledWith({
+      role: 'STUDENT',
+      page: 1,
+      size: 100,
+    });
+    expect(document.querySelectorAll('mat-option')).toHaveLength(150);
   });
 });

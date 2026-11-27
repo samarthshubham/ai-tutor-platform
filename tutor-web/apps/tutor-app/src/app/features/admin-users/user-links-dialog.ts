@@ -19,7 +19,7 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { ApiError, RelationshipApi, Role, User, UserApi } from '@tutor-web/api';
 import { ErrorBanner, Loading } from '@tutor-web/ui';
-import { forkJoin, map, Observable } from 'rxjs';
+import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 
 export const LINKABLE_ROLES: Role[] = ['STUDENT', 'PARENT', 'TUTOR'];
 
@@ -87,13 +87,7 @@ export class UserLinksDialog {
     this.error.set(null);
     const roles = [...new Set(this.sections.map((s) => s.candidateRole))];
     forkJoin([
-      forkJoin(
-        roles.map((role) =>
-          this.userApi
-            .list({ role, size: CANDIDATE_PAGE_SIZE })
-            .pipe(map((page) => page.content)),
-        ),
-      ),
+      forkJoin(roles.map((role) => this.listEveryUser(role))),
       this.listRows(),
     ])
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -166,6 +160,24 @@ export class UserLinksDialog {
           this.busy.set(false);
         },
       });
+  }
+
+  private listEveryUser(role: Role): Observable<User[]> {
+    const fetchPage = (page: number) =>
+      this.userApi.list({ role, page, size: CANDIDATE_PAGE_SIZE });
+    return fetchPage(0).pipe(
+      switchMap((first) =>
+        first.totalPages <= 1
+          ? of(first.content)
+          : forkJoin(
+              Array.from({ length: first.totalPages - 1 }, (_, index) =>
+                fetchPage(index + 1),
+              ),
+            ).pipe(
+              map((rest) => [first, ...rest].flatMap((page) => page.content)),
+            ),
+      ),
+    );
   }
 
   private listRows(): Observable<Record<string, LinkRow[]>> {
