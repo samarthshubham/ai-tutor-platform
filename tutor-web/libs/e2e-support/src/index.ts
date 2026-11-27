@@ -3,3 +3,5 @@ export { DEMO_USERS, demoPassword, type DemoUser } from './lib/demo-users';
 export { createRunPrefix, runPrefix, withRunPrefix } from './lib/run-prefix';
 export { stackUrl, type StackUrl } from './lib/stack-url';
 export { clearTokenCache, tokenFor } from './lib/token';
+export { registerCommands } from './lib/commands';
+export { loginAs, signInOnKeycloakPage } from './lib/login';
