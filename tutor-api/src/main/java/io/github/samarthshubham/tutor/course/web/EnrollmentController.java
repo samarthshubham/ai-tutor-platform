@@ -6,7 +6,9 @@ import io.github.samarthshubham.tutor.identity.api.CurrentUser;
 import io.github.samarthshubham.tutor.identity.api.UserSummary;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,6 +40,15 @@ public class EnrollmentController {
   @Operation(summary = "The students enrolled in a course")
   public List<UserSummary> students(CurrentUser user, @PathVariable UUID courseId) {
     return enrollments.students(user, courseId);
+  }
+
+  @GetMapping("/student-search")
+  @Operation(summary = "Find students in the school by name or username for enrollment")
+  public List<UserSummary> searchStudents(
+      CurrentUser user,
+      @PathVariable UUID courseId,
+      @RequestParam("q") @NotBlank @Size(max = 100) String query) {
+    return enrollments.searchStudents(user, courseId, query);
   }
 
   @PostMapping("/enrollments")

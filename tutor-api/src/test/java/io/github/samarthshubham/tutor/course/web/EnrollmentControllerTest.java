@@ -46,6 +46,29 @@ class EnrollmentControllerTest {
           Role.TEACHER,
           UUID.fromString("00000000-0000-0000-0000-000000000001"));
 
+  @Test
+  void searchesStudentsAndReturnsOnlySummaries() throws Exception {
+    when(enrollments.searchStudents(teacher, COURSE, "Sam"))
+        .thenReturn(List.of(new UserSummary(STUDENT, "Sam Student", Role.STUDENT)));
+    mvc.perform(
+            get("/api/courses/" + COURSE + "/student-search")
+                .param("q", "Sam")
+                .with(TestJwt.as(Role.TEACHER)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].id").value(STUDENT.toString()))
+        .andExpect(jsonPath("$[0].displayName").value("Sam Student"))
+        .andExpect(jsonPath("$[0].email").doesNotExist());
+  }
+
+  @Test
+  void rejectsBlankSearch() throws Exception {
+    mvc.perform(
+            get("/api/courses/" + COURSE + "/student-search")
+                .param("q", " ")
+                .with(TestJwt.as(Role.TEACHER)))
+        .andExpect(status().isBadRequest());
+  }
+
   @BeforeEach
   void stubTeacher() {
     when(currentUserProvider.currentUser()).thenReturn(teacher);

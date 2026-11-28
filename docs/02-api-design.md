@@ -73,6 +73,7 @@ Linking a user with the wrong role (for example a teacher as `parentId`) is `400
 | PUT | `/topics/{id}` | A, T own | E2-S1 | Rename or reorder |
 | DELETE | `/topics/{id}` | A, T own | E2-S1 | Delete; `409` when lessons or questions use it |
 | GET | `/courses/{id}/students` | A, T own | E2-S1 | Enrolled students |
+| GET | `/courses/{id}/student-search?q=` | A, T own | E2-S3 | Find up to 20 students in the same school for enrollment by display name or username |
 | POST | `/courses/{id}/enrollments` | A, T own | E2-S1 | Enroll a student |
 | DELETE | `/courses/{id}/enrollments/{studentId}` | A, T own | E2-S1 | Remove |
 
@@ -90,6 +91,8 @@ Linking a user with the wrong role (for example a teacher as `parentId`) is `400
 ```
 
 `position` is optional when adding a topic (the topic goes last). Enrolling a user who is not a student in the school, or creating a course for a `teacherId` who is not a teacher, is `400` naming the field. Course writes, topic writes and enrollment changes on an archived course are `409`.
+
+The enrollment search requires a nonblank query of at most 100 characters and returns the same student summary shape as the enrolled list. It requires an active course.
 
 Course visibility: admin sees all in the school; teacher sees courses they teach; student sees enrolled courses; tutor and parent see courses their students are enrolled in.
 

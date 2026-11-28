@@ -1,0 +1,133 @@
+<tp-page-header [title]="canCreate() ? 'Courses' : 'My courses'">
+  @if (canCreate() && !creating()) {
+  <button matButton="filled" type="button" (click)="creating.set(true)">
+    New course
+  </button>
+  }
+</tp-page-header>
+@if (creating()) {
+<form
+  class="panel fields"
+  [formGroup]="form"
+  (ngSubmit)="create()"
+  aria-label="New course"
+>
+  <mat-form-field
+    ><mat-label>Course title</mat-label
+    ><input matInput formControlName="title" required maxlength="200"
+  /></mat-form-field>
+  <mat-form-field
+    ><mat-label>Subject</mat-label
+    ><input matInput formControlName="subject" required maxlength="100"
+  /></mat-form-field>
+  <mat-form-field
+    ><mat-label>Grade level</mat-label
+    ><input
+      matInput
+      type="number"
+      formControlName="gradeLevel"
+      required
+      min="1"
+      max="12"
+  /></mat-form-field>
+  <mat-form-field
+    ><mat-label>Description</mat-label
+    ><textarea
+      matInput
+      formControlName="description"
+      maxlength="2000"
+    ></textarea>
+  </mat-form-field>
+  @if (admin()) {
+  <div class="fields row">
+    <mat-form-field
+      ><mat-label>Teacher name or username</mat-label
+      ><input matInput [formControl]="teacherQuery" maxlength="100"
+    /></mat-form-field>
+    <button
+      matButton="outlined"
+      type="button"
+      [disabled]="teacherQuery.invalid || !teacherQuery.value.trim() || teachers.isLoading()"
+      (click)="findTeachers()"
+    >
+      Find teachers
+    </button>
+  </div>
+  @if (teachers.isLoading()) {
+  <tp-loading label="Finding teachers…" />
+  } @else if (error(teachers); as failure) {
+  <tp-error-banner [error]="failure" (retry)="teachers.reload()" />
+  } @else if (teachers.hasValue()) { @if (teachers.value().content.length === 0)
+  {
+  <tp-empty-state
+    title="No matching teachers"
+    message="Try a different name or username."
+  />
+  } @else {
+  <label for="course-teacher">Teacher</label>
+  <select id="course-teacher" formControlName="teacherId" required>
+    <option value="">Choose a teacher</option>
+    @for (teacher of teachers.value().content; track teacher.id) {
+    <option [value]="teacher.id">
+      {{ teacher.displayName }} ({{ teacher.username }})
+    </option>
+    }
+  </select>
+  } } } @if (mutation.error(); as failure) {
+  <tp-error-banner [error]="failure" (retry)="mutation.retry()" />
+  }
+  <div class="row">
+    <button
+      matButton="filled"
+      type="submit"
+      [disabled]="form.invalid || mutation.busy() || (admin() && !form.controls.teacherId.value)"
+    >
+      Create course
+    </button>
+    <button
+      matButton
+      type="button"
+      [disabled]="mutation.busy()"
+      (click)="cancelCreate()"
+    >
+      Cancel
+    </button>
+  </div>
+</form>
+} @if (courses.isLoading()) {
+<tp-loading label="Loading courses…" />
+} @else if (error(courses); as failure) {
+<tp-error-banner [error]="failure" (retry)="courses.reload()" />
+} @else if (courses.hasValue()) { @if (courses.value().content.length === 0) {
+<tp-empty-state
+  title="No courses"
+  [message]="canCreate() ? 'Create a course to add topics and lessons.' : 'Your enrolled courses will appear here.'"
+/>
+} @else {
+<div class="cards">
+  @for (course of courses.value().content; track course.id) {
+  <mat-card appearance="outlined">
+    <mat-card-header
+      ><mat-card-title
+        ><a [routerLink]="['/courses', course.id]"
+          >{{ course.title }}</a
+        ></mat-card-title
+      ></mat-card-header
+    >
+    <mat-card-content>
+      <p>
+        {{ course.subject }} · Grade {{ course.gradeLevel }} · {{
+        course.teacherName }}
+      </p>
+      @if (course.description) {
+      <p>{{ course.description }}</p>
+      } @if (canCreate() && course.status === 'ARCHIVED') {
+      <p>Archived</p>
+      }
+    </mat-card-content>
+  </mat-card>
+  }
+</div>
+}
+<tp-pagination [page]="courses.value()" (navigate)="page.set($event)" />
+}

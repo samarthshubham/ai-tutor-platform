@@ -1,0 +1,234 @@
+<a matButton routerLink="/courses">Back to courses</a>
+@if (course.isLoading() && !course.hasValue()) {
+<tp-loading label="Loading course…" />
+} @else if (error(course); as failure) {
+<tp-error-banner [error]="failure" (retry)="course.reload()" />
+} @else if (course.hasValue()) { @let current = course.value();
+<tp-page-header
+  [title]="current.title"
+  [subtitle]="current.subject + ' · Grade ' + current.gradeLevel + ' · ' + current.teacherName"
+/>
+@if (current.description) {
+<p>{{ current.description }}</p>
+}
+<mat-tab-group>
+  <mat-tab label="Lessons">
+    <div class="section">
+      @if (canAuthor()) {
+      <a
+        matButton="filled"
+        [routerLink]="['/courses', current.id, 'lessons', 'new']"
+        >New lesson</a
+      >
+      } @if (lessons.isLoading()) {
+      <tp-loading label="Loading lessons…" />
+      } @else if (error(lessons); as failure) {
+      <tp-error-banner [error]="failure" (retry)="lessons.reload()" />
+      } @else if (lessons.hasValue()) { @if (lessons.value().content.length ===
+      0) {
+      <tp-empty-state
+        title="No lessons"
+        [message]="staff() && !current.topics.length ? 'Add a topic before creating a lesson.' : 'Available lessons will appear here.'"
+      />
+      } @else {
+      <ul class="list">
+        @for (lesson of lessons.value().content; track lesson.id) {
+        <li>
+          <a [routerLink]="['/lessons', lesson.id]">{{ lesson.title }}</a>
+          @if ('status' in lesson) { <mat-chip>{{ lesson.status }}</mat-chip> }
+        </li>
+        }
+      </ul>
+      }
+      <tp-pagination
+        [page]="lessons.value()"
+        (navigate)="lessonPage.set($event)"
+      />
+      }
+    </div>
+  </mat-tab>
+  <mat-tab label="Topics">
+    <div class="section">
+      @if (writable()) {
+      <form
+        class="row"
+        (submit)="$event.preventDefault(); addTopic()"
+        aria-label="Add a topic"
+      >
+        <mat-form-field
+          ><mat-label>New topic name</mat-label
+          ><input matInput [formControl]="topicName" maxlength="200" required
+        /></mat-form-field>
+        <button
+          matButton="filled"
+          type="submit"
+          [disabled]="topicName.invalid || !topicName.value.trim() || topicsMutation.busy()"
+        >
+          Add topic
+        </button>
+      </form>
+      } @if (topicsMutation.error(); as failure) {
+      <tp-error-banner [error]="failure" (retry)="topicsMutation.retry()" />
+      } @if (current.topics.length === 0) {
+      <tp-empty-state
+        title="No topics"
+        message="Topics for this course will appear here."
+      />
+      } @else {
+      <ol class="list" aria-label="Topics in order">
+        @for (topic of current.topics; track topic.id) {
+        <li>
+          @if (writable() && topicId() === topic.id) {
+          <form
+            class="row"
+            [formGroup]="topicForm"
+            (ngSubmit)="saveTopic()"
+            [attr.aria-label]="'Edit ' + topic.name"
+          >
+            <mat-form-field
+              ><mat-label>Topic name</mat-label
+              ><input matInput formControlName="name" required maxlength="200"
+            /></mat-form-field>
+            <mat-form-field
+              ><mat-label>Position</mat-label
+              ><input
+                matInput
+                type="number"
+                formControlName="position"
+                min="1"
+                required
+            /></mat-form-field>
+            <button
+              matButton="filled"
+              type="submit"
+              [disabled]="topicForm.invalid || topicsMutation.busy()"
+            >
+              Save topic
+            </button>
+            <button
+              matButton
+              type="button"
+              [disabled]="topicsMutation.busy()"
+              (click)="topicId.set(null); topicsMutation.clear()"
+            >
+              Cancel
+            </button>
+          </form>
+          } @else {
+          <span>{{ topic.position }}. {{ topic.name }}</span>
+          @if (writable()) {
+          <div class="row">
+            <button
+              matButton
+              type="button"
+              [disabled]="topicsMutation.busy()"
+              [attr.aria-label]="'Edit ' + topic.name"
+              (click)="editTopic(topic)"
+            >
+              Edit
+            </button>
+            <button
+              matButton
+              type="button"
+              [disabled]="topicsMutation.busy()"
+              [attr.aria-label]="'Delete ' + topic.name"
+              (click)="deleteTopic(topic.id)"
+            >
+              Delete
+            </button>
+          </div>
+          } }
+        </li>
+        }
+      </ol>
+      }
+    </div>
+  </mat-tab>
+  @if (staff()) {
+  <mat-tab label="Students">
+    <div class="section">
+      @if (writable()) {
+      <form
+        class="row"
+        (submit)="$event.preventDefault(); findStudents()"
+        aria-label="Find a student"
+      >
+        <mat-form-field
+          ><mat-label>Student name or username</mat-label
+          ><input
+            matInput
+            [formControl]="studentQuery"
+            maxlength="100"
+            required
+        /></mat-form-field>
+        <button
+          matButton="outlined"
+          type="submit"
+          [disabled]="studentQuery.invalid || !studentQuery.value.trim() || matches.isLoading()"
+        >
+          Find students
+        </button>
+      </form>
+      @if (matches.isLoading()) {
+      <tp-loading label="Finding students…" />
+      } @else if (error(matches); as failure) {
+      <tp-error-banner [error]="failure" (retry)="matches.reload()" />
+      } @else if (matches.hasValue()) { @if (matches.value().length === 0) {
+      <tp-empty-state
+        title="No matching students"
+        message="Try a different name or username."
+      />
+      } @else {
+      <ul class="list" aria-label="Matching students">
+        @for (student of matches.value(); track student.id) {
+        <li>
+          {{ student.displayName }}
+          <button
+            matButton
+            type="button"
+            [attr.aria-label]="'Enroll ' + student.displayName"
+            [disabled]="studentsMutation.busy() || students.isLoading() || enrolled(student.id)"
+            (click)="enroll(student.id)"
+          >
+            {{ enrolled(student.id) ? 'Enrolled' : 'Enroll' }}
+          </button>
+        </li>
+        }
+      </ul>
+      } } } @if (studentsMutation.error(); as failure) {
+      <tp-error-banner [error]="failure" (retry)="studentsMutation.retry()" />
+      }
+      <h2>Enrolled students</h2>
+      @if (students.isLoading()) {
+      <tp-loading label="Loading enrolled students…" />
+      } @else if (error(students); as failure) {
+      <tp-error-banner [error]="failure" (retry)="students.reload()" />
+      } @else if (students.hasValue()) { @if (students.value().length === 0) {
+      <tp-empty-state
+        title="No students enrolled"
+        message="Enrolled students will appear here."
+      />
+      } @else {
+      <ul class="list" aria-label="Enrolled students">
+        @for (student of students.value(); track student.id) {
+        <li>
+          {{ student.displayName }} @if (writable()) {
+          <button
+            matButton
+            type="button"
+            [disabled]="studentsMutation.busy()"
+            [attr.aria-label]="'Remove ' + student.displayName"
+            (click)="remove(student.id)"
+          >
+            Remove
+          </button>
+          }
+        </li>
+        }
+      </ul>
+      } }
+    </div>
+  </mat-tab>
+  }
+</mat-tab-group>
+}

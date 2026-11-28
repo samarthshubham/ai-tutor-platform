@@ -45,12 +45,15 @@ public class UserService {
   @Transactional(readOnly = true)
   public PageResponse<UserResponse> search(
       UUID schoolId, Role role, String query, int page, int size) {
-    Specification<AppUser> filter =
-        Specification.allOf(inSchool(schoolId), hasRole(role), matches(query));
+    Specification<AppUser> filter = searchFilter(schoolId, role, query);
     return PageResponse.from(
         users
             .findAll(filter, PageRequest.of(page, size, BY_DISPLAY_NAME))
             .map(UserService::toResponse));
+  }
+
+  static Specification<AppUser> searchFilter(UUID schoolId, Role role, String query) {
+    return Specification.allOf(inSchool(schoolId), hasRole(role), matches(query));
   }
 
   private static Specification<AppUser> inSchool(UUID schoolId) {

@@ -51,6 +51,12 @@ public class EnrollmentService {
         enrollments.findByCourseId(courseId).stream().map(Enrollment::getStudentId).toList());
   }
 
+  @Transactional(readOnly = true)
+  public List<UserSummary> searchStudents(CurrentUser user, UUID courseId, String query) {
+    writable.require(user, courseId);
+    return relationships.searchStudents(user.schoolId(), query.strip());
+  }
+
   @Transactional
   public EnrollmentResponse enroll(CurrentUser user, UUID courseId, UUID studentId) {
     writable.require(user, courseId);

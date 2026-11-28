@@ -20,5 +20,7 @@ public interface RelationshipQuery {
 
   Optional<UserSummary> findUser(UUID id);
 
+  List<UserSummary> searchStudents(UUID schoolId, String query);
+
   List<UserSummary> findUsers(Collection<UUID> ids);
 }

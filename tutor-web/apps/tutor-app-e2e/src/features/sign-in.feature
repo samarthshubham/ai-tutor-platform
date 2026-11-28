@@ -12,10 +12,10 @@ Feature: Sign in and the role-based shell
 
     Examples:
       | username | name         | role    | route        | items |
-      | admin1   | Ada Admin    | Admin   | /admin/users | Users |
-      | teacher1 | Tara Teacher | Teacher | /home        | Home  |
+      | admin1   | Ada Admin    | Admin   | /admin/users | Users, Lesson review, Courses |
+      | teacher1 | Tara Teacher | Teacher | /courses     | Courses |
       | tutor1   | Uma Tutor    | Tutor   | /home        | Home  |
-      | student1 | Sam Student  | Student | /home        | Home  |
+      | student1 | Sam Student  | Student | /courses     | My courses |
       | parent1  | Pat Parent   | Parent  | /home        | Home  |
 
   Scenario: A deep link opened signed out returns to that link after sign-in
@@ -32,7 +32,7 @@ Feature: Sign in and the role-based shell
   Scenario: Signing out ends the session and the back button shows nothing protected
     Given I open "/" signed out
     And I sign in as "teacher1" on the Keycloak page
-    And I land on "/home"
+    And I land on "/courses"
     When I sign out
     Then I am on the Keycloak sign-in page
     When I go back in the browser

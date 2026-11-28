@@ -1,0 +1,79 @@
+@if (mutation.error(); as failure) {
+<tp-error-banner [error]="failure" (retry)="mutation.retry()" />
+}
+<div class="actions">
+  @if (teacher() && lesson().status === 'DRAFT') {
+  <a matButton="outlined" [routerLink]="['/lessons', lesson().id, 'edit']"
+    >Edit draft</a
+  >
+  <button
+    matButton="filled"
+    type="button"
+    [disabled]="mutation.busy()"
+    (click)="transition('submit')"
+  >
+    Submit for review
+  </button>
+  } @if (teacher() && lesson().status === 'PUBLISHED') {
+  <button
+    matButton="filled"
+    type="button"
+    [disabled]="mutation.busy()"
+    (click)="transition('revise')"
+  >
+    Revise lesson
+  </button>
+  } @if (canReview()) {
+  <button
+    matButton="filled"
+    type="button"
+    [disabled]="mutation.busy()"
+    (click)="transition('publish')"
+  >
+    Publish
+  </button>
+  <button
+    matButton="outlined"
+    type="button"
+    [disabled]="mutation.busy()"
+    (click)="requestChanges()"
+  >
+    Request changes
+  </button>
+  } @if (canArchive()) {
+  <button
+    matButton
+    type="button"
+    [disabled]="mutation.busy()"
+    (click)="transition('archive')"
+  >
+    Archive lesson
+  </button>
+  }
+</div>
+<ng-template #commentDialog>
+  <h2 mat-dialog-title>Request changes</h2>
+  <mat-dialog-content>
+    <mat-form-field>
+      <mat-label>Reviewer comment</mat-label>
+      <textarea
+        matInput
+        [formControl]="comment"
+        rows="5"
+        required
+        maxlength="2000"
+      ></textarea>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button matButton mat-dialog-close type="button">Cancel</button>
+    <button
+      matButton="filled"
+      [mat-dialog-close]="comment.value"
+      [disabled]="comment.invalid || !comment.value.trim()"
+      type="button"
+    >
+      Send back
+    </button>
+  </mat-dialog-actions>
+</ng-template>
