@@ -117,6 +117,7 @@ PostgreSQL 16 with the `vector` extension (image `pgvector/pgvector:pg16`), data
 | lesson_version | id | uuid PK | |
 | | lesson_id | uuid FK lesson | UQ `(lesson_id, version)` |
 | | version | int | starts at 1 |
+| | topic_id | uuid FK topic | snapshot of the published topic |
 | | title | varchar(200) | snapshot |
 | | body_markdown | text | snapshot |
 | | published_by | uuid FK app_user | |

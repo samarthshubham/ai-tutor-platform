@@ -95,7 +95,7 @@ Course visibility: admin sees all in the school; teacher sees courses they teach
 
 ## 4. Lessons (CMS)
 
-Status flow: `DRAFT -> IN_REVIEW -> PUBLISHED -> ARCHIVED`. `request-changes` moves `IN_REVIEW -> DRAFT`. `revise` on a `PUBLISHED` lesson moves it to `DRAFT` while students keep seeing the last published version. A wrong transition is `409`.
+Status flow: `DRAFT -> IN_REVIEW -> PUBLISHED -> ARCHIVED`. `request-changes` moves `IN_REVIEW -> DRAFT`. `revise` on a `PUBLISHED` lesson moves it to `DRAFT` while readers keep seeing the last published version. Archiving removes the lesson from the reader view and preserves its history for staff. A wrong transition or a concurrent stale write returns `409`.
 
 | Method | Path | Roles | Story | Purpose |
 |---|---|---|---|---|
@@ -107,7 +107,7 @@ Status flow: `DRAFT -> IN_REVIEW -> PUBLISHED -> ARCHIVED`. `request-changes` mo
 | POST | `/lessons/{id}/publish` | A | E2-S2 | `IN_REVIEW -> PUBLISHED`, snapshots a version |
 | POST | `/lessons/{id}/request-changes` | A | E2-S2 | `IN_REVIEW -> DRAFT` with a comment |
 | POST | `/lessons/{id}/revise` | T own | E2-S2 | `PUBLISHED -> DRAFT`, published version stays live |
-| POST | `/lessons/{id}/archive` | A, T own | E2-S2 | Any status to `ARCHIVED` |
+| POST | `/lessons/{id}/archive` | A, T own | E2-S2 | Archive from `DRAFT`, `IN_REVIEW` or `PUBLISHED` |
 | GET | `/lessons/{id}/versions` | A, T own | E2-S2 | Published versions, newest first |
 | GET | `/lessons?status=IN_REVIEW` | A | E2-S2 | Review queue across courses |
 
@@ -123,7 +123,7 @@ Status flow: `DRAFT -> IN_REVIEW -> PUBLISHED -> ARCHIVED`. `request-changes` mo
 // POST /lessons/{id}/request-changes   { "comment": "Add a worked example" }
 ```
 
-`bodyMarkdown` is 1 to 50,000 characters.
+`bodyMarkdown` is 1 to 50,000 characters. A lesson's topic must belong to its course. Published versions snapshot the topic, title and body. Lesson lists, the review queue and version history use the paging envelope in §1. Each history entry uses the published view above. In the course lesson list, the reader view accepts `status=PUBLISHED` and returns an empty page for other statuses.
 
 ## 5. Content index (RAG)
 
