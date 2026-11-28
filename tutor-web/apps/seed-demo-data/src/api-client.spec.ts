@@ -58,6 +58,7 @@ describe('SeedApi', () => {
     vi.advanceTimersByTime(31_000);
     await api.get('teacher1', '/me');
 
+    expect(api.writeCount).toBe(2);
     expect(fetch.mock.calls[0][1].body).toEqual(
       new URLSearchParams({
         grant_type: 'password',
@@ -111,8 +112,10 @@ describe('SeedApi', () => {
         .mockResolvedValueOnce(tokenResponse())
         .mockResolvedValueOnce(new Response(null, { status: 409 })),
     );
+    const api = new SeedApi();
     await expect(
-      new SeedApi().post('teacher1', '/courses', { title: 'Duplicate' }),
+      api.post('teacher1', '/courses', { title: 'Duplicate' }),
     ).rejects.toThrow('API POST /api/courses failed (HTTP 409)');
+    expect(api.writeCount).toBe(0);
   });
 });

@@ -81,17 +81,20 @@ jobs:
         working-directory: tutor-web
         run: npm ci
 
-      - name: Seed the demo school twice and compare counts
+      - name: Verify the demo school and check that reseeding makes no writes
         working-directory: tutor-web
         env:
           NX_DAEMON: 'false'
           NX_NO_CLOUD: 'true'
+          SEED_TAGS: '@prepare or @verify-demo'
+        shell: bash
         run: |
           for pass in 1 2; do
             npx nx run seed-demo-data:seed --outputStyle=static | tee "$LOGS/seed-$pass.log"
             grep '^Seed counts: ' "$LOGS/seed-$pass.log" > "$LOGS/seed-$pass.counts"
           done
           diff -u "$LOGS/seed-1.counts" "$LOGS/seed-2.counts"
+          grep -Fx "Seed writes: 0" "$LOGS/seed-2.log"
 
       - name: Build and serve tutor-app
         working-directory: tutor-web

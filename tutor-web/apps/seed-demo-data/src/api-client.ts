@@ -3,16 +3,22 @@ import { demoTokenRequest, type DemoUser } from '@tutor-web/e2e-support';
 const API_URL = 'http://localhost:9190';
 const KEYCLOAK_URL = 'http://localhost:8180';
 
-interface Page<T> {
+export interface Page<T> {
   content: T[];
   totalPages: number;
+  totalElements: number;
 }
 
 export class SeedApi {
+  private writes = 0;
   private readonly tokens = new Map<
     DemoUser,
     { value: string; expires: number }
   >();
+
+  get writeCount(): number {
+    return this.writes;
+  }
 
   async checkServices(): Promise<void> {
     await this.request('API', `${API_URL}/actuator/health`);
@@ -27,7 +33,9 @@ export class SeedApi {
   }
 
   async post<T>(user: DemoUser, path: string, body?: object): Promise<T> {
-    return this.api(user, path, 'POST', body);
+    const result = await this.api<T>(user, path, 'POST', body);
+    this.writes++;
+    return result;
   }
 
   async find<T>(
