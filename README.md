@@ -58,12 +58,15 @@ Prerequisites: Docker, Java 21, Node 22, `curl` and `jq`, and optionally [Ollama
 
 ```bash
 ./dev.sh                     # starts the containers, tutor-api and tutor-app, waits until each is healthy, prints URLs and demo logins
+./dev.sh seed                # prepares the demo school on the running stack
 ./dev.sh status              # every service, and the AI profile tutor-api runs with
 ./dev.sh logs tutor-api      # or tutor-app, postgres, keycloak, mailpit, prometheus, grafana; files are in logs/
 ./dev.sh stop                # stops everything (Ctrl+C in the dev.sh terminal does the same); data is kept
 ```
 
 Then open http://localhost:4310. tutor-api uses the `ollama` profile when Ollama answers on `http://localhost:11434` (`OLLAMA_URL` changes it) and the deterministic `fake-ai` profile otherwise; `AI_PROFILE=ollama|cloud|fake-ai ./dev.sh` forces one (`cloud` needs `ANTHROPIC_API_KEY`). The demo users are `admin1`, `teacher1`, `teacher2`, `tutor1`, `student1` to `student3`, `parent1` and `parent2`, with the role plus `#2026` as password (`Teacher#2026`).
+
+Run `./dev.sh seed` in a second terminal once the stack is ready. It creates the two Grade 8 courses, five topics, five lessons and their demo relationships through the API. Running it again leaves the demo records in place and prints the same counts. Sign in as `student1` to see both courses, or as `student3` to see only Grade 8 Science. You can also run `npx nx run seed-demo-data:seed` from `tutor-web/`.
 
 If your local Keycloak realm already exists, [update the web client settings](infra/README.md#realm-tutor) before signing in on the new port.
 

@@ -13,6 +13,18 @@ export function clearTokenCache(): void {
   cachedTokens.clear();
 }
 
+export function demoTokenRequest(keycloakUrl: string, username: string) {
+  return {
+    url: `${keycloakUrl}/realms/tutor/protocol/openid-connect/token`,
+    body: {
+      grant_type: 'password',
+      client_id: 'tutor-cli',
+      username,
+      password: demoPassword(username),
+    },
+  };
+}
+
 export function tokenFor(username: string): Cypress.Chainable<string> {
   const cached = cachedTokens.get(username);
   if (cached && cached.expiresAt > Date.now()) {
@@ -21,14 +33,8 @@ export function tokenFor(username: string): Cypress.Chainable<string> {
   return cy
     .request<TokenResponse>({
       method: 'POST',
-      url: `${stackUrl('keycloakUrl')}/realms/tutor/protocol/openid-connect/token`,
+      ...demoTokenRequest(stackUrl('keycloakUrl'), username),
       form: true,
-      body: {
-        grant_type: 'password',
-        client_id: 'tutor-cli',
-        username,
-        password: demoPassword(username),
-      },
       log: false,
     })
     .then(({ body }) => {

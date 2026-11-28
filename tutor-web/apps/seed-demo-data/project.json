@@ -1,0 +1,27 @@
+{
+  "name": "seed-demo-data",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/seed-demo-data/src",
+  "projectType": "application",
+  "tags": ["type:e2e"],
+  "targets": {
+    "seed": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "esbuild apps/seed-demo-data/src/steps.ts --bundle --platform=node --packages=external --outfile=dist/seed-demo-data/steps.cjs --log-level=warning && cucumber-js --require dist/seed-demo-data/steps.cjs --tags \"${SEED_TAGS:-@prepare}\" apps/seed-demo-data/features",
+        "cwd": "."
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "^default"],
+      "outputs": ["{workspaceRoot}/coverage/seed-demo-data"],
+      "options": {
+        "command": "tsc -p tsconfig.json && vitest run",
+        "cwd": "apps/seed-demo-data"
+      }
+    }
+  }
+}
