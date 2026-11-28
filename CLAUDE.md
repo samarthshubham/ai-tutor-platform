@@ -110,7 +110,7 @@ npm ci
 npx nx serve tutor-app                                 # :4310, proxies /api and /actuator to :9190
 npx nx run-many -t lint test build
 npx nx e2e tutor-app-e2e                               # needs the stack running on fake-ai (E0-S5); CYPRESS_tags=@smoke for one tag
-npx nx run seed-demo-data:seed                         # (E2-S4)
+npx nx run seed-demo-data:seed                         # prepare the demo school on the running stack
 
 # Whole stack (E0-S5)
 ./dev.sh            # start; Ctrl+C stops. Never run it under `timeout`.
@@ -118,7 +118,7 @@ npx nx run seed-demo-data:seed                         # (E2-S4)
 ./dev.sh status     # each container, tutor-api (with its AI profile), tutor-app, Ollama
 ./dev.sh logs <service>   # tutor-api, tutor-app or a compose service; logs/ holds the files
 AI_PROFILE=fake-ai ./dev.sh   # force a profile (ollama|cloud|fake-ai); default: ollama if OLLAMA_URL answers, else fake-ai
-./dev.sh seed       # (E2-S4)
+./dev.sh seed       # prepare the demo school on the running stack
 
 # Workflow scripts
 python3 -m unittest discover -s .github/scripts -p 'test_*.py'
@@ -126,6 +126,8 @@ REPO=samarthshubham/ai-tutor-platform python3 -I .github/scripts/create-issues.p
 ```
 
 Demo users (dev realm only): `admin1`, `teacher1`, `teacher2`, `tutor1`, `student1`, `student2`, `student3`, `parent1`, `parent2`. Password: the role in title case plus `#2026`, for example `Teacher#2026`. Details in roadmap §5.
+
+Demo seed: start the stack before `./dev.sh seed`. Repeat it to verify the same counts. It uses the demo users and the public API.
 
 AI profiles: `ollama` (local, default when Ollama is running), `cloud` (hosted chat model, needs `ANTHROPIC_API_KEY`), `fake-ai` (deterministic, used by tests, CI and e2e). Exactly one is active.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Runs the whole local stack: the compose services, tutor-api and tutor-app.
-# Usage: ./dev.sh [start|stop|status|logs <service>]   (no argument means start)
+# Usage: ./dev.sh [start|stop|status|logs <service>|seed]   (no argument means start)
 # Env:   AI_PROFILE=ollama|cloud|fake-ai  skips the Ollama check
 #        OLLAMA_URL                       Ollama to check and use (default http://localhost:11434)
 # Never run `./dev.sh start` under `timeout`: its signal trap tears the stack down.
@@ -305,10 +305,11 @@ logs() {
 }
 
 usage() {
-  echo "Usage: ./dev.sh [start|stop|status|logs <service>]"
+  echo "Usage: ./dev.sh [start|stop|status|logs <service>|seed]"
   echo "  start            start everything and wait; Ctrl+C stops it (default)"
   echo "  stop             stop everything dev.sh started and the containers (data is kept)"
   echo "  status           show each service"
+  echo "  seed             prepare the demo school on the running stack"
   echo "  logs <service>   last 200 lines, followed in a terminal; services: ${APP_SERVICES[*]} ${COMPOSE_SERVICES[*]}"
 }
 
@@ -316,6 +317,7 @@ case "${1:-start}" in
   start) start ;;
   stop) stop ;;
   status) status ;;
+  seed) cd "$ROOT/tutor-web" && exec npm exec --no -- nx run seed-demo-data:seed ;;
   logs) logs "${2:-}" ;;
   -h | --help | help) usage ;;
   *)

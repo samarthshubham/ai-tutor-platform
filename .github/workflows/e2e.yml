@@ -81,6 +81,18 @@ jobs:
         working-directory: tutor-web
         run: npm ci
 
+      - name: Seed the demo school twice and compare counts
+        working-directory: tutor-web
+        env:
+          NX_DAEMON: 'false'
+          NX_NO_CLOUD: 'true'
+        run: |
+          for pass in 1 2; do
+            npx nx run seed-demo-data:seed --outputStyle=static | tee "$LOGS/seed-$pass.log"
+            grep '^Seed counts: ' "$LOGS/seed-$pass.log" > "$LOGS/seed-$pass.counts"
+          done
+          diff -u "$LOGS/seed-1.counts" "$LOGS/seed-2.counts"
+
       - name: Build and serve tutor-app
         working-directory: tutor-web
         env:
