@@ -67,6 +67,11 @@ public class TopicService {
       throw new ConflictException("Topic is in use");
     }
     topics.delete(topic);
+    try {
+      topics.flush();
+    } catch (DataIntegrityViolationException e) {
+      throw new ConflictException("Topic is in use");
+    }
   }
 
   private Topic find(UUID topicId) {
