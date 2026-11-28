@@ -51,6 +51,15 @@ class EnrollmentControllerAuthorizationTest {
   }
 
   @Test
+  void searchStudents() {
+    new AuthorizationMatrix(
+            mvc, () -> get("/api/courses/" + ID + "/student-search").param("q", "Sam"))
+        .expect(200, Role.ADMIN, Role.TEACHER)
+        .expect(403, Role.TUTOR, Role.STUDENT, Role.PARENT)
+        .verify(401);
+  }
+
+  @Test
   void enroll() {
     new AuthorizationMatrix(
             mvc,

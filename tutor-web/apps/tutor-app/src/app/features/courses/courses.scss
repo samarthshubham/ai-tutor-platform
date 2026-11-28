@@ -1,0 +1,48 @@
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 16px;
+}
+.panel {
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+}
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.row {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 8px;
+  align-items: baseline;
+}
+.list {
+  display: grid;
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+}
+.list > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  gap: 8px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+.section {
+  padding-top: 16px;
+}
+select {
+  color: var(--mat-sys-on-surface);
+  background: var(--mat-sys-surface);
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: var(--mat-sys-corner-extra-small);
+  padding: 8px;
+  max-width: max-content;
+}

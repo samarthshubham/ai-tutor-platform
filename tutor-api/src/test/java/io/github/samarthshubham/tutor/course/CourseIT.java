@@ -192,6 +192,29 @@ class CourseIT extends IntegrationTest {
   }
 
   @Test
+  void studentSearchIsLimitedToTheManagedCourseAndSchool() throws Exception {
+    String course = createCourse(teacher, "Search");
+    UUID school = UUID.randomUUID();
+    jdbc.update(
+        "insert into school (id, name, created_at) values (?, 'Other school', now())", school);
+    try {
+      jdbc.update("update app_user set school_id = ? where id = ?", school, otherStudentId);
+      String path = "/api/courses/" + course + "/student-search";
+      mvc.perform(as(teacher, get(path).param("q", run)))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.length()").value(1))
+          .andExpect(jsonPath("$[0].id").value(studentId.toString()));
+      mvc.perform(as(otherTeacher, get(path).param("q", run))).andExpect(status().isNotFound());
+    } finally {
+      jdbc.update(
+          "update app_user set school_id = (select school_id from app_user where id = ?) where id = ?",
+          studentId,
+          otherStudentId);
+      jdbc.update("delete from school where id = ?", school);
+    }
+  }
+
+  @Test
   void enrollmentRulesHold() throws Exception {
     String course = createCourse(teacher, "Enrolling");
 

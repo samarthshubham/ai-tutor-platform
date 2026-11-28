@@ -1,0 +1,91 @@
+<tp-page-header
+  [title]="editor.hasValue() && editor.value().lesson ? 'Edit lesson' : 'New lesson'"
+/>
+@if (editor.isLoading()) {
+<tp-loading label="Loading lesson editor…" />
+} @else if (error(editor); as failure) {
+<tp-error-banner [error]="failure" (retry)="editor.reload()" />
+} @else if (editor.hasValue()) { @let course = editor.value().course; @let
+lesson = editor.value().lesson; @if (lesson) {
+<a matButton [routerLink]="['/lessons', lesson.id]">Back to lesson</a>
+} @else {
+<a matButton [routerLink]="['/courses', course.id]"
+  >Back to {{ course.title }}</a
+>
+} @if (lesson && (!('status' in lesson) || lesson.status !== 'DRAFT')) {
+<tp-empty-state
+  title="This lesson cannot be edited"
+  message="Only draft lessons can be edited."
+/>
+} @else if (course.topics.length === 0) {
+<tp-empty-state
+  title="No topics"
+  message="Add a course topic before writing a lesson."
+/>
+} @else { @if (lesson && 'reviewComment' in lesson && lesson.reviewComment) {
+<section class="feedback">
+  <h2>Reviewer comment</h2>
+  <p>{{ lesson.reviewComment }}</p>
+</section>
+}
+<form [formGroup]="form" (ngSubmit)="save()">
+  <fieldset [disabled]="mutation.busy()">
+    <div class="fields">
+      <mat-form-field
+        ><mat-label>Lesson title</mat-label
+        ><input matInput formControlName="title" required maxlength="200"
+      /></mat-form-field>
+      <mat-form-field>
+        <mat-label>Topic</mat-label>
+        <mat-select
+          formControlName="topicId"
+          [disabled]="mutation.busy()"
+          required
+        >
+          @for (topic of course.topics; track topic.id) {
+          <mat-option [value]="topic.id">{{ topic.name }}</mat-option> }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="editor">
+      <mat-form-field
+        ><mat-label>Lesson Markdown</mat-label
+        ><textarea
+          matInput
+          formControlName="bodyMarkdown"
+          rows="14"
+          required
+          maxlength="50000"
+        ></textarea>
+      </mat-form-field>
+      <section aria-labelledby="preview-title" class="preview">
+        <h2 id="preview-title">Preview</h2>
+        <tp-markdown [source]="markdown()" />
+      </section>
+    </div>
+    @if (mutation.error(); as failure) {
+    <tp-error-banner [error]="failure" (retry)="mutation.retry()" />
+    }
+    <div class="actions">
+      <button
+        matButton="filled"
+        type="submit"
+        [disabled]="form.invalid || !form.controls.title.value.trim() || mutation.busy()"
+      >
+        Save draft
+      </button>
+      @if (lesson) {
+      <button
+        matButton="outlined"
+        type="button"
+        [disabled]="form.dirty || form.invalid || mutation.busy()"
+        (click)="submit(lesson.id)"
+      >
+        Submit for review
+      </button>
+      } @if (saved() && !form.dirty) { <span role="status">Draft saved</span> }
+      @if (form.dirty) { <span>Save changes before submitting.</span> }
+    </div>
+  </fieldset>
+</form>
+} }

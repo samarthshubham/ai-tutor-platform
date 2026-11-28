@@ -193,6 +193,18 @@ public class RelationshipService implements RelationshipQuery {
         .toList();
   }
 
+  @Override
+  @Transactional(readOnly = true)
+  public List<UserSummary> searchStudents(UUID schoolId, String query) {
+    return users
+        .findBy(
+            UserService.searchFilter(schoolId, Role.STUDENT, query),
+            search -> search.sortBy(Sort.by("displayName", "id")).limit(20).all())
+        .stream()
+        .map(RelationshipService::toSummary)
+        .toList();
+  }
+
   private void requirePair(
       String otherField, UUID otherId, Role otherRole, UUID studentId, UUID schoolId) {
     AppUser other = requireExisting(otherId);

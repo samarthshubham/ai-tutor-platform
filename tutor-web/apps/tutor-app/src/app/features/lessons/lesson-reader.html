@@ -1,0 +1,21 @@
+@if (lesson.isLoading()) {
+<tp-loading label="Loading lesson…" />
+} @else if (error(lesson); as failure) {
+<tp-error-banner [error]="failure" (retry)="lesson.reload()" />
+} @else if (lesson.hasValue()) { @let current = lesson.value(); @if (role() ===
+'ADMIN' || role() === 'TEACHER' || role() === 'STUDENT') {
+<a matButton [routerLink]="['/courses', current.courseId]">Back to course</a>
+}
+<tp-page-header [title]="current.title">
+  @if ('status' in current) { <mat-chip>{{ current.status }}</mat-chip> }
+</tp-page-header>
+@if ('status' in current) { @if (current.reviewComment) {
+<section class="feedback">
+  <h2>Reviewer comment</h2>
+  <p>{{ current.reviewComment }}</p>
+</section>
+}
+<tp-lesson-actions [lesson]="current" (changed)="lesson.set($event)" />
+}
+<article><tp-markdown [source]="current.bodyMarkdown" /></article>
+}

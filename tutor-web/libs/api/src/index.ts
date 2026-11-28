@@ -8,3 +8,7 @@ export * from './lib/role';
 export * from './lib/sse-client';
 export * from './lib/user';
 export * from './lib/user-api';
+export * from './lib/course';
+export * from './lib/course-api';
+export * from './lib/lesson';
+export * from './lib/lesson-api';

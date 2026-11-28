@@ -1,7 +1,9 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { ApiError, HealthApi, Role, User } from '@tutor-web/api';
+import { ApiError, CourseApi, HealthApi, Role, User } from '@tutor-web/api';
 import { AuthService } from '@tutor-web/auth';
 import { of } from 'rxjs';
 import { App } from './app';
@@ -46,6 +48,12 @@ describe('App shell', () => {
     TestBed.configureTestingModule({
       providers: [
         provideRouter(appRoutes),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        {
+          provide: CourseApi,
+          useValue: { list: () => of({ content: [], page: 0, totalPages: 0 }) },
+        },
         { provide: AuthService, useValue: auth },
         { provide: HealthApi, useValue: { get: () => of({ status: 'UP' }) } },
       ],
@@ -87,10 +95,10 @@ describe('App shell', () => {
   });
 
   it.each([
-    ['ADMIN', ['Users']],
-    ['TEACHER', ['Home']],
+    ['ADMIN', ['Users', 'Lesson review', 'Courses']],
+    ['TEACHER', ['Courses']],
     ['TUTOR', ['Home']],
-    ['STUDENT', ['Home']],
+    ['STUDENT', ['My courses']],
     ['PARENT', ['Home']],
   ] as [Role, string[]][])(
     'should show the navigation of %s',
@@ -102,7 +110,7 @@ describe('App shell', () => {
   );
 
   it('should mark the current page', async () => {
-    const { el } = await render('TEACHER');
+    const { el } = await render('TEACHER', '/courses');
 
     expect(links(el)[0].getAttribute('aria-current')).toBe('page');
   });
@@ -132,7 +140,7 @@ describe('App shell', () => {
   it('should send unknown routes to the role home', async () => {
     await render('TEACHER', '/does-not-exist');
 
-    expect(TestBed.inject(Router).url).toBe('/home');
+    expect(TestBed.inject(Router).url).toBe('/courses');
   });
 
   it('should show a loading state instead of the shell without a user', async () => {
