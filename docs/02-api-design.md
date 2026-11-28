@@ -84,8 +84,12 @@ Linking a user with the wrong role (for example a teacher as `parentId`) is `400
   "teacherId": "…", "teacherName": "Tara Teacher", "status": "ACTIVE",
   "topics": [ { "id": "…", "name": "Photosynthesis", "position": 1 } ] }
 // POST /courses/{id}/topics   { "name": "Photosynthesis", "position": 1 }
-// POST /courses/{id}/enrollments   { "studentId": "…" }
+// POST /courses/{id}/topics   { "name": "Photosynthesis", "position": 1 } -> 201 { "id": "…", "name": "Photosynthesis", "position": 1 }
+// POST /courses/{id}/enrollments   { "studentId": "…" } -> 201 { "courseId": "…", "studentId": "…" }
+// GET /courses/{id}/students -> [ { "id": "…", "displayName": "Sam Student", "role": "STUDENT" } ]
 ```
+
+`position` is optional when adding a topic (the topic goes last). Enrolling a user who is not a student in the school, or creating a course for a `teacherId` who is not a teacher, is `400` naming the field. Course writes, topic writes and enrollment changes on an archived course are `409`.
 
 Course visibility: admin sees all in the school; teacher sees courses they teach; student sees enrolled courses; tutor and parent see courses their students are enrolled in.
 

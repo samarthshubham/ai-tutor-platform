@@ -171,6 +171,12 @@ public class RelationshipService implements RelationshipQuery {
 
   @Override
   @Transactional(readOnly = true)
+  public boolean hasRoleInSchool(UUID userId, Role role, UUID schoolId) {
+    return users.existsByIdAndSchoolIdAndRole(userId, schoolId, role);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
   public Optional<UserSummary> findUser(UUID id) {
     return users.findById(id).map(RelationshipService::toSummary);
   }
